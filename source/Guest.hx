@@ -1,26 +1,32 @@
 package;
 
 import flixel.FlxSprite;
+import flixel.input.mouse.FlxMouseEventManager;
+import flixel.FlxG;
 import flixel.math.FlxPoint;
-import flixel.system.FlxAssets.FlxGraphicAsset;
 
-/**
- * ...
- * @author Dave
- */
-class Guest extends FlxSprite
-{
+class Guest extends FlxSprite {
+	var beingDragged:Bool = false;
+	var dragOffset:FlxPoint;
+	override public function new(x: Float, y: Float, path: String) {
+		super(x, y, path);
 
-	public function new(?X:Float=0, ?Y:Float=0, ?SimpleGraphic:FlxGraphicAsset) 
-	{
-		super(X, Y, SimpleGraphic);
-		
+		FlxMouseEventManager.add(this, onPress, onRelease, null, null);
 	}
-	
-	override public function update(elapsed:Float):Void 
-	{
-		super.update(elapsed);
-		
+
+	private function onPress(Sprite:FlxSprite) {
+		dragOffset = FlxPoint.get(x - FlxG.mouse.x, y - FlxG.mouse.y);
+		beingDragged = true;
 	}
-	
+
+	private function onRelease(Sprite:FlxSprite) {
+		beingDragged = false;
+	}
+
+	override public function update(elapsed: Float) {
+
+		if(beingDragged) {
+			setPosition(FlxG.mouse.x + dragOffset.x, FlxG.mouse.y + dragOffset.y);
+		}
+	}
 }
