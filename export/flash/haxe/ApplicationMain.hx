@@ -34,6 +34,14 @@ class ApplicationMain {
 		types.push (lime.Assets.AssetType.TEXT);
 		
 		
+		urls.push ("assets/images/bg.png");
+		types.push (lime.Assets.AssetType.IMAGE);
+		
+		
+		urls.push ("assets/images/guest.png");
+		types.push (lime.Assets.AssetType.IMAGE);
+		
+		
 		urls.push ("assets/images/images-go-here.txt");
 		types.push (lime.Assets.AssetType.TEXT);
 		
@@ -63,6 +71,10 @@ class ApplicationMain {
 		
 		
 		urls.push ("flixel/images/ui/button.png");
+		types.push (lime.Assets.AssetType.IMAGE);
+		
+		
+		urls.push ("flixel/images/logo/default.png");
 		types.push (lime.Assets.AssetType.IMAGE);
 		
 		
@@ -127,7 +139,7 @@ class ApplicationMain {
 		
 		config = {
 			
-			build: "2",
+			build: "8",
 			company: "HaxeFlixel",
 			file: "LD37-OneRoomResort",
 			fps: 60,
