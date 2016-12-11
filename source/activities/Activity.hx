@@ -1,6 +1,8 @@
 package activities;
 
+import flixel.FlxG;
 import flixel.FlxSprite;
+import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.system.FlxAssets.FlxGraphicAsset;
 
 /**
@@ -25,6 +27,16 @@ class Activity extends FlxSprite
 	{
 		super(X, Y);
 		
+		this.loadGraphic('assets/image/activities.png', true, 96, 76);
+		animation.add('pool', [0]);
+		animation.add('tennis', [1]);
+		
+		
+	}
+	
+	override public function update(elapsed:Float):Void 
+	{
+		super.update(elapsed);
 	}
 	
 }
