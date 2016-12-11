@@ -13,13 +13,20 @@ class MenuState extends FlxState
 	override public function create():Void
 	{
 		super.create();
-		
 		var start:FlxButton = new FlxButton(0,0,"Start Game", clickStart);
 		
+		add(start);
 	}
 	
-	private function clickStart(_) {
-	
+	private function clickStart() {
+		var endState:LevelEndState = new LevelEndState( {
+			levelName:'Test',
+			guestHappiness:[90, 84, 32],
+			guestType:['norm','norm','norm']
+			
+		});
+		
+		FlxG.switchState(endState);
 	}
 
 	override public function update(elapsed:Float):Void
