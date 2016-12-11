@@ -16,15 +16,15 @@ typedef LevelDef =
 	var gameLength:Float;
 	
 	//Starting email settings
-	var startTo:String;
-	var startFron:String;
-	var startSubject:String;
-	var startEmail:String;
+	@:optional var startTo:String;
+	@:optional var startFrom:String;
+	@:optional var startSubject:String;
+	@:optional var startEmail:String;
 	
 	//Finish email settings
-	var endTo:String;
-	var endFron:String;
-	var endSubject:String;
-	var endEmail:String;
+	@:optional var endTo:String;
+	@:optional var endFrom:String;
+	@:optional var endSubject:String;
+	@:optional var endEmail:String;
 	
 }

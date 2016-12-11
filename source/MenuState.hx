@@ -15,11 +15,21 @@ class MenuState extends FlxState
 		super.create();
 		
 		var start:FlxButton = new FlxButton(0,0,"Start Game", clickStart);
+		add(start);
 		
 	}
 	
-	private function clickStart(_) {
-	
+	private function clickStart() {
+		var level1Def:LevelDef = {
+			name:"Level 1",
+			activities:["room", "pool", "tennis", "spa", "tennis", "spa"],
+			guests: 5,
+			gameLength:240
+		};
+
+
+		var level:LevelState = new LevelState(level1Def);
+		FlxG.switchState(level);
 	}
 
 	override public function update(elapsed:Float):Void
