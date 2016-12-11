@@ -31,8 +31,6 @@ class Activity extends FlxSprite
 		animation.add('pool', [0]);
 		animation.add('tennis', [1]);
 		
-		var a:Array<Int> = [];
-		a.
 		
 	}
 	
