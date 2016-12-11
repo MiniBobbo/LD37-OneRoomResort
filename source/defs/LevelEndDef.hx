@@ -6,6 +6,9 @@ package defs;
  */
 typedef LevelEndDef =
 {
+	//The level number.
+	var level:Int;
+	
 	//The name of the level
 	var levelName:String;
 	
