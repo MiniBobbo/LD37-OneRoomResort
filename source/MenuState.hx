@@ -13,13 +13,13 @@ class MenuState extends FlxState
 	override public function create():Void
 	{
 		super.create();
-		var bg:FlxSprite = new FlxSprite();
-		bg.makeGraphic(FlxG.width, FlxG.height, FlxColor.GREEN);
-		add(bg);
 		
+		var start:FlxButton = new FlxButton(0,0,"Start Game", clickStart);
 		
-		this.openSubState(new EmailSubstate('Boss', 'Worker', 'Thanks for the job', 'I just wanted to pass along a note saything thanks for the job opportunity.'));
-		
+	}
+	
+	private function clickStart(_) {
+	
 	}
 
 	override public function update(elapsed:Float):Void
