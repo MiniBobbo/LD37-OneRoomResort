@@ -55,7 +55,7 @@ class DaveTestState extends FlxState
 		var endDef:LevelEndDef = {
 			level:1,
 			levelName:'Test Level',
-			guestHappiness:[100, 80, 34,50,65,34,92,66,44,77,88],
+			guestHappiness:[100, 80, 100,50,65,100,92,66,100,77,88],
 			guestType:['norm','norm','norm']
 			
 		};

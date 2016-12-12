@@ -1,4 +1,4 @@
-		animation.add('happynothing', [0,1,0], 5, true);
+		animation.add('happynothing', [0,1,0], 5, false);
 		animation.add('neutralnothing', [2,3,2],  5, false);
 		animation.add('sadnothing', [4,5,4], 5, false);
 		animation.add('happypool', [6,7,6], 5,false);
