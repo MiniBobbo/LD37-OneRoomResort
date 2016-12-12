@@ -25,6 +25,7 @@ class LevelEndState extends FlxState
 	var sg:FlxSpriteGroup;
 	var titleText:FlxText;
 	var titleOffset:FlxPoint;
+	var wsr:FlxSprite;
 
 	var guestsOffset:FlxPoint;
 	var totalOffset:FlxPoint;
@@ -74,6 +75,33 @@ class LevelEndState extends FlxState
 		titleText= new FlxText(titleOffset.x, titleOffset.y, FlxG.width, info.levelName + " Completed!", 30);
 		titleText.setFormat(null, 30, FlxColor.WHITE, FlxTextAlign.CENTER);
 
+		wsr = new FlxSprite(250, 0);
+		wsr.loadGraphic('assets/images/bg3.png');
+		sg.add(wsr);
+		
+		var total:Float=0;
+		//Find the average happiness.
+		for(i in info.guestHappiness)
+			total += i;
+		total = total / info.guestHappiness.length;	
+		
+		var statusReport = new FlxText(265, 20, 0, "One Room Resort\nWeekly Status Report", 16);
+		statusReport.setFormat(null, 12,FlxColor.BLACK);
+		sg.add(statusReport);
+		
+		var m:String = '';
+		
+		if (total > 80)
+			m = 'Successful week!\nWe should be getting some good reviews on Yelp.';
+		else if (total > 60)
+			m = 'Well, that could have gone better.  Maybe we should invest in SOME ADDITIONAL ROOMS?';
+		else
+			m = 'At least nobody died this week.';
+		
+		var message:FlxText = new FlxText(265, 65, 180, "Score: " + Std.int(total) + "\n\n" + m);
+		message.setFormat(null, 8, FlxColor.BLACK);
+		sg.add(message);
+		
 		//Loop through the list of guests and create a sprite for each
 		for (i in 0...info.guestHappiness.length)
 		{
@@ -83,6 +111,7 @@ class LevelEndState extends FlxState
 			s.animation.add('happy', [0]);
 			s.animation.add('neutral', [2]);
 			s.animation.add('sad', [4]);
+			
 			//Set the animation based on the happiness level
 			if (info.guestHappiness[i] <= 80)
 				s.animation.play('neutral');
