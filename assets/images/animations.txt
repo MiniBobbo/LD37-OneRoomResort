@@ -1,0 +1,14 @@
+		animation.add('happynothing', [0,1,0], 5, true);
+		animation.add('neutralnothing', [2,3,2],  5, false);
+		animation.add('sadnothing', [4,5,4], 5, false);
+		animation.add('happypool', [6,7,6], 5,false);
+		animation.add('neutralpool', [8,9,8],5, false);
+		animation.add('sadpool', [10,11,10], 5, false);
+		animation.add('happytennis', [12,13,12], 5, false);
+		animation.add('neutraltennis', [14,15,14], 5, false);
+		animation.add('happyroom', [16,17,16], 5, false);
+		animation.add('happyspa', [18,19,18], 5, false);
+		animation.add('neutralspa', [20,21,20], 5, false);
+		animation.add('sadspa', [22,23,22], 5, false);
+		
+		
