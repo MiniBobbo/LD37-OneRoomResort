@@ -78,11 +78,11 @@ class LevelEndState extends FlxState
 		for (i in 0...info.guestHappiness.length)
 		{
 			var s = new FlxSprite(guestsOffset.x, (spaceBetweenGuests * i));
-			//TODO:  For now, this is hard coded.  Change this to use the info.guestType when there are multiples.
+			//Load the animations.
 			s.loadGraphic('assets/images/guest.png', true, 32, 32);
 			s.animation.add('happy', [0]);
-			s.animation.add('neutral', [1]);
-			s.animation.add('sad', [2]);
+			s.animation.add('neutral', [2]);
+			s.animation.add('sad', [4]);
 			//Set the animation based on the happiness level
 			if (info.guestHappiness[i] <= 80)
 				s.animation.play('neutral');
