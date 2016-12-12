@@ -115,6 +115,9 @@ class Activity extends FlxSprite {
 	public function removeGuest(guest: Guest) {
 		FlxG.log.add("Remove Guest");
 		guests.remove(guest);
+		if(name == "tennis" && guests.length == 1) {
+			guests[0].setMood("sad");
+		}
 	}
 
 	public function addGuest(guest: Guest): Bool {
@@ -161,6 +164,7 @@ class Activity extends FlxSprite {
 		}
 
 		if(guest.energy <= 0) {
+			guest.energy = 0;
 			//guest.disable();
 		}
 		if(name != "room" && (time % unhappinessThreshhold == 0) && time != 0) {

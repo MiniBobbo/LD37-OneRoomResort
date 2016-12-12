@@ -19,6 +19,8 @@ class Guest extends FlxSprite {
 	var curMood: String;
 	var disabled: Bool;
 
+	var gender: String;
+
 	var energyBar:FlxBar;
 	var happinessBar:FlxBar;
 
@@ -37,7 +39,7 @@ class Guest extends FlxSprite {
 
 		energyBar = new FlxBar(x - 5, y - 10, 42, 2, this, "energy", 0, 100);
 		happinessBar = new FlxBar(x - 5, y - 5, 42, 2, this, "happiness", 0, 100);
-
+		this.gender = gender;
 		if(gender == "male") {
 			this.loadGraphic('assets/images/guest.png', true, 32, 32);
 		} else {
@@ -128,9 +130,11 @@ class Guest extends FlxSprite {
 					curActivity = a;
 					lastPoint.x = x;
 					lastPoint.y = y;
-					if(curActivity.getName() != prevActivity.getName()) {
-						setMood("happy");
-						timeInCurActivity = 0;	
+					if(curActivity.getName() != "tennis") {
+						if(curActivity.getName() != prevActivity.getName()) {
+							setMood("happy");
+							timeInCurActivity = 0;	
+						}
 					}
 					playAnimation();
 				}
@@ -164,6 +168,10 @@ class Guest extends FlxSprite {
 	override function setPosition(X: Float = 0, Y: Float = 0) {
 		super.setPosition(X, Y);
 		updateBarPositions();
+	}
+
+	public function getGender(): String {
+		return gender;
 	}
 
 	private function updateBarPositions() {

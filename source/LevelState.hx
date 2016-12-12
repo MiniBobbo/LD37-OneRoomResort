@@ -9,6 +9,7 @@ import flixel.math.FlxPoint;
 import flixel.math.FlxRandom;
 import flixel.text.FlxText;
 import flixel.ui.FlxBar;
+import defs.LevelEndDef;
 /**
  * ...
  * @author Dave
@@ -108,6 +109,22 @@ class LevelState extends FlxState
 		super.update(elapsed);
 
 		timeRemaining -= elapsed;
+		if(timeRemaining <= 0) {
+			var endHappiness = new Array<Float>();
+			var guestGenders = new Array<String>();
+			for(g in guestGroup) {
+				endHappiness.push(g.happiness);
+				guestGenders.push(g.getGender());
+			}
+			var endDef:LevelEndDef = {
+				level:1,
+				levelName:levelInfo.name,
+				guestHappiness:endHappiness,
+				guestType:guestGenders
+			};
+
+			FlxG.switchState(new LevelEndState(endDef));
+		}
 
 		timerText.text = getTimeText(timeRemaining);
 		

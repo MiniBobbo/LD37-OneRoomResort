@@ -107,7 +107,11 @@ class LevelEndState extends FlxState
 		{
 			var s = new FlxSprite(guestsOffset.x, (spaceBetweenGuests * i));
 			//Load the animations.
-			s.loadGraphic('assets/images/guest.png', true, 32, 32);
+			if(info.guestType[i] == "male") {
+				s.loadGraphic('assets/images/guest.png', true, 32, 32);
+			} else {
+				s.loadGraphic('assets/images/guestfemale.png', true, 32, 32);
+			}
 			s.animation.add('happy', [0]);
 			s.animation.add('neutral', [2]);
 			s.animation.add('sad', [4]);
