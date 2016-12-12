@@ -2,8 +2,11 @@ package;
 
 import flixel.FlxSprite;
 import flixel.input.mouse.FlxMouseEventManager;
+import flixel.FlxState;
 import flixel.FlxG;
 import flixel.math.FlxPoint;
+import flixel.math.FlxRandom;
+import flixel.ui.FlxBar;
 
 class Guest extends FlxSprite {
 	var beingDragged:Bool = false;
@@ -14,23 +17,36 @@ class Guest extends FlxSprite {
 	var totalTime: Float;
 
 	var curMood: String;
+	var disabled: Bool;
+
+	var energyBar:FlxBar;
+	var happinessBar:FlxBar;
 
 	var animCounter: Float;
 	var timeToNextAnim: Float;
+	var timeInCurActivity: Float;
 	public var flipped: String;
 
-	var happiness: Int;
-	var energy: Int;
+	public var happiness: Float;
+	public var energy: Float;
 	var curActivity: Activity;
 	var prevActivity: Activity;
 
-	override public function new(x: Float, y: Float, path: String) {
+	override public function new(x: Float, y: Float, path: String, gender: String) {
 		super(x, y, path);
 
-		this.loadGraphic('assets/images/guest.png', true, 32, 32);
+		energyBar = new FlxBar(x - 5, y - 10, 42, 2, this, "energy", 0, 100);
+		happinessBar = new FlxBar(x - 5, y - 5, 42, 2, this, "happiness", 0, 100);
+
+		if(gender == "male") {
+			this.loadGraphic('assets/images/guest.png', true, 32, 32);
+		} else {
+			this.loadGraphic('assets/images/guestfemale.png', true, 32, 32);
+		}
 
 		curMood = "happy";
 		flipped = "normal";
+		disabled = false;
 
 		var frameTime = 5;
 
@@ -69,6 +85,7 @@ class Guest extends FlxSprite {
 		prevActivity = null;
 
 		animCounter = 0;
+		timeInCurActivity = 0;
 		timeToNextAnim = 1.5 + FlxG.random.float(0, 2);
 
 		happiness = 75;
@@ -76,6 +93,15 @@ class Guest extends FlxSprite {
 
 		FlxMouseEventManager.add(this, onPress, onRelease, null, null);
 	}
+
+	public function getEnergyBar():FlxBar {
+		return energyBar;
+	}
+
+	public function getHappinessBar(): FlxBar {
+		return happinessBar;
+	}
+
 
 	private function onPress(Sprite:FlxSprite) {
 		dragOffset = FlxPoint.get(x - FlxG.mouse.x, y - FlxG.mouse.y);
@@ -102,6 +128,10 @@ class Guest extends FlxSprite {
 					curActivity = a;
 					lastPoint.x = x;
 					lastPoint.y = y;
+					if(curActivity.getName() != prevActivity.getName()) {
+						setMood("happy");
+						timeInCurActivity = 0;	
+					}
 					playAnimation();
 				}
 				break;
@@ -111,6 +141,12 @@ class Guest extends FlxSprite {
 
 	override public function update(elapsed: Float) {
 		super.update(elapsed);
+
+		var timeInSecs:Int = Math.floor(timeInCurActivity);
+		timeInCurActivity += elapsed;
+		if(Math.floor(timeInCurActivity) > timeInSecs) {
+			curActivity.updateGuest(this, timeInSecs);
+		}
 
 		animCounter += elapsed;
 		if(animCounter > timeToNextAnim) {
@@ -125,6 +161,16 @@ class Guest extends FlxSprite {
 		}
 	}
 
+	override function setPosition(X: Float = 0, Y: Float = 0) {
+		super.setPosition(X, Y);
+		updateBarPositions();
+	}
+
+	private function updateBarPositions() {
+		energyBar.setPosition(x - 5, y - 10);
+		happinessBar.setPosition(x - 5, y - 5);
+	}
+
 	private function playAnimation() {
 		animation.play(curMood + curActivity.getName() + flipped);
 	}
@@ -133,4 +179,8 @@ class Guest extends FlxSprite {
 		curMood = newMood;
 		playAnimation();
 	}
+
+	public function getMood(): String {
+		return curMood;
+	} 
 }

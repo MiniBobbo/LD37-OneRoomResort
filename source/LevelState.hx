@@ -8,6 +8,7 @@ import flixel.input.mouse.FlxMouseEventManager;
 import flixel.math.FlxPoint;
 import flixel.math.FlxRandom;
 import flixel.text.FlxText;
+import flixel.ui.FlxBar;
 /**
  * ...
  * @author Dave
@@ -66,7 +67,18 @@ class LevelState extends FlxState
 		for(i in 0...levelInfo.guests) {
 			var x = rand.int(0, 60);
 			var y = rand.int(0, FlxG.height - 40);
-			guestGroup.add(new Guest(x, y, 'assets/images/guest.png'));
+			var genders = ["male", "female"];
+			var gender = genders[rand.int(0, 1)];
+			var guest: Guest;
+			if(gender == "male") {
+				guest = new Guest(x, y, 'assets/images/guest.png', 'male');
+			} else {
+				guest = new Guest(x, y, 'assets/images/guestfemale.png', 'female');
+			}
+			add(guest.getEnergyBar());
+			add(guest.getHappinessBar());
+
+			guestGroup.add(guest);
 		}
 
 		for (g in guestGroup) {

@@ -16,6 +16,8 @@ class Activity extends FlxSprite {
 	var sadnessAdded: Float;
 	var sadnessAddedTime: Float;
 
+	var unhappinessThreshhold: Float;
+
 	var capacity: Int;
 
 	var guests:Array<Guest>;
@@ -44,11 +46,12 @@ class Activity extends FlxSprite {
 
 		if(name == "nothing") {
 			type = 'nothing';
-			energyPerSecond = 2;
-			happinessAdded = 2;
-			happinessAddedTime = 2;
+			energyPerSecond = 1;
+			happinessAdded = 1;
+			happinessAddedTime = 3;
 			sadnessAdded = 2;
-			sadnessAddedTime = 2;
+			sadnessAddedTime = 3;
+			unhappinessThreshhold = 5;
 			capacity = 100;
 		} else if(name == "pool") {
 			type = 'relaxation';
@@ -58,6 +61,7 @@ class Activity extends FlxSprite {
 			sadnessAdded = 2;
 			sadnessAddedTime = 2;
 			capacity = 6;
+			unhappinessThreshhold = 10;
 			positions.push(new FlxPoint(x + 5, y + 20));
 			positions.push(new FlxPoint(x + 5, y + 43));
 			positions.push(new FlxPoint(x + 30, y + 5));
@@ -65,32 +69,33 @@ class Activity extends FlxSprite {
 			positions.push(new FlxPoint(x + 55, y + 15));
 			positions.push(new FlxPoint(x + 55, y + 38));
 			flipField = ["normal", "normal", "normal", "flipped", "flipped", "flipped"];
-
 		} else if(name == "tennis") {
 			type = 'exercise';
-			energyPerSecond = 2;
-			happinessAdded = 2;
+			energyPerSecond = 3;
+			happinessAdded = 3;
 			happinessAddedTime = 2;
 			sadnessAdded = 2;
 			sadnessAddedTime = 2;
+			unhappinessThreshhold = 15;
 			positions.push(new FlxPoint(x + 10, y + 20));
 			positions.push(new FlxPoint(x + 60, y + 20));
 			flipField = ["normal", "flipped"];
 			capacity = 2;
 		} else if(name == "spa") {
 			type = 'relaxation';
-			energyPerSecond = 2;
+			energyPerSecond = 1;
 			happinessAdded = 2;
 			happinessAddedTime = 2;
 			sadnessAdded = 2;
 			sadnessAddedTime = 2;
+			unhappinessThreshhold = 10;
 			positions.push(new FlxPoint(x, y + 25));
 			positions.push(new FlxPoint(x + 70, y + 12));
 			flipField = ["normal", "flipped"];
 			capacity = 2;
 		} else if(name == "room") {
 			type = 'sleep';
-			energyPerSecond = 2;
+			energyPerSecond = -5;
 			happinessAdded = 2;
 			happinessAddedTime = 2;
 			sadnessAdded = 2;
@@ -146,5 +151,37 @@ class Activity extends FlxSprite {
 			}
 		}
 		return true;
+	}
+
+	public function updateGuest(guest:Guest, time: Int) {
+		if(name != "tennis" || guests.length == 2) {
+			guest.energy -= energyPerSecond;
+		} else {
+			guest.energy -= 1;
+		}
+
+		if(guest.energy <= 0) {
+			//guest.disable();
+		}
+		if(name != "room" && (time % unhappinessThreshhold == 0) && time != 0) {
+			if(guest.getMood() == "happy"){
+				guest.setMood("neutral");
+			} else if(name != "tennis") {
+				guest.setMood("sad");
+			}
+		}
+		if(name != "tennis" || guests.length == 2) {
+			if(time % happinessAddedTime == 0 && guest.getMood() == "happy") {
+				guest.happiness += happinessAdded;
+			} else if(time % sadnessAddedTime == 0 && guest.getMood() == "sad") {
+				guest.happiness -= sadnessAdded;
+			}
+		} else {
+			if(time % 3 == 0 && guest.getMood() == "happy") {
+				guest.happiness += 1;
+			} else if(time % 3 == 0 && guest.getMood() == "sad") {
+				guest.happiness -= 2;
+			}
+		}
 	}
 }
