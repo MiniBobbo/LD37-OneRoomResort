@@ -11,6 +11,7 @@ import flixel.math.FlxPoint;
 import flixel.math.FlxRandom;
 import flixel.text.FlxText;
 import flixel.ui.FlxBar;
+import types.MoodType;
 /**
  * ...
  * @author Dave
@@ -135,11 +136,11 @@ class LevelState extends FlxState
 		//Check the emotion spawn queue and spawn any important emotions.
 		for (i in 0...H.emotions.length) {
 			var g = H.emotions.pop();
-			if (g.getMood() == 'happy' && g.curActivity.getName() != 'nothing') {
+			if (g.getMood() == MoodType.happy && g.curActivity.getName() != 'nothing') {
 				//TODO  Add an icon spawn here.
 				emoteGroup.getFirstAvailable().spawn(g);
 				FlxG.sound.play('assets/sounds/hearts.wav', .1);
-			} else if (g.getMood() == 'sad') {
+			} else if (g.getMood() == MoodType.sad) {
 				emoteGroup.getFirstAvailable().spawn(g);
 				FlxG.sound.play('assets/sounds/sad.wav', .1);
 			}

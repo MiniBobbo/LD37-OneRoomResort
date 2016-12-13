@@ -27,7 +27,7 @@ class Emot extends FlxSprite
 	 */
 	public function spawn(guest:Guest) {
 		reset(guest.x + (guest.width / 2), guest.y + (guest.height / 2));
-		animation.play(guest.getMood() );
+		animation.play(guest.getMood()+ '' );
 		acceleration.y -= 10 + FlxG.random.float(0, 30);
 		velocity.set();
 		velocity.x = FlxG.random.float( -10, 10);

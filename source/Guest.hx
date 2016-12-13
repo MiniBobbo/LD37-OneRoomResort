@@ -8,6 +8,7 @@ import flixel.math.FlxPoint;
 import flixel.math.FlxRandom;
 import flixel.ui.FlxBar;
 import flixel.util.FlxColor;
+import types.MoodType;
 
 class Guest extends FlxSprite {
 	var beingDragged:Bool = false;
@@ -17,7 +18,8 @@ class Guest extends FlxSprite {
 
 	var totalTime: Float;
 
-	var curMood: String;
+	var curMood: MoodType;
+	var lastMood: MoodType;
 	var disabled: Bool;
 
 	var energyBar:FlxBar;
@@ -47,7 +49,8 @@ class Guest extends FlxSprite {
 
 		this.loadGraphic('assets/images/'+ type+ '.png', true, 32, 32);
 
-		curMood = "happy";
+		curMood = MoodType.happy;
+		lastMood = MoodType.happy;
 		flipped = "normal";
 		disabled = false;
 
@@ -132,7 +135,7 @@ class Guest extends FlxSprite {
 					lastPoint.x = x;
 					lastPoint.y = y;
 					if(curActivity.getName() != prevActivity.getName()) {
-						setMood("happy");
+						setMood(MoodType.happy);
 						timeInCurActivity = 0;	
 					}
 					playAnimation();
@@ -170,16 +173,13 @@ class Guest extends FlxSprite {
 		
 		//Clamp happiness and energy at 0 and 100.
 		if (happiness <= 0 )
-		happiness = 0;
-		
+			happiness = 0;
 		if (happiness > 100)
-		happiness = 100;
-		
+			happiness = 100;
 		if (energy < 0)
-		energy = 0;
-		
+			energy = 0;
 		if (energy > 100)
-		energy = 100;
+			energy = 100;
 		
 	}
 
@@ -198,12 +198,13 @@ class Guest extends FlxSprite {
 		animation.play(curMood + curActivity.getName() + flipped);
 	}
 
-	public function setMood(newMood: String) {
+	public function setMood(newMood: MoodType) {
+		lastMood = curMood;
 		curMood = newMood;
 		playAnimation();
 	}
 
-	public function getMood(): String {
+	public function getMood(): MoodType {
 		return curMood;
 	} 
 }

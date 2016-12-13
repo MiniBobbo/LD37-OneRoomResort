@@ -4,6 +4,7 @@ import flixel.FlxG;
 import flixel.util.FlxColor;
 import flixel.math.FlxPoint;
 import types.ActivityTypes;
+import types.MoodType;
 
 class Activity extends FlxSprite {
 	var name: String;
@@ -49,16 +50,16 @@ class Activity extends FlxSprite {
 			type = ActivityTypes.nothing;
 			energyPerSecond = 1;
 			happinessAdded = 0;
-			happinessAddedTime = 3;
+			happinessAddedTime = 5;
 			sadnessAdded = 2;
-			sadnessAddedTime = 3;
+			sadnessAddedTime = 10;
 			unhappinessThreshhold = 5;
 			capacity = 100;
 		} else if(name == "pool") {
 			type = ActivityTypes.relaxation;
 			energyPerSecond = 2;
 			happinessAdded = 2;
-			happinessAddedTime = 2;
+			happinessAddedTime = 10;
 			sadnessAdded = 2;
 			sadnessAddedTime = 2;
 			capacity = 6;
@@ -144,10 +145,10 @@ class Activity extends FlxSprite {
 		guests.push(guest);
 		if(name == "tennis") {
 			if(guests.length == 1) {
-				guest.setMood("sad");
+				guest.setMood(MoodType.sad);
 			} else {
 				for(g in guests) {
-					g.setMood("happy");
+					g.setMood(MoodType.happy);
 				}
 			}
 		}
@@ -165,22 +166,22 @@ class Activity extends FlxSprite {
 			//guest.disable();
 		}
 		if(name != "room" && (time % unhappinessThreshhold == 0) && time != 0) {
-			if(guest.getMood() == "happy"){
-				guest.setMood("neutral");
+			if(guest.getMood() == MoodType.happy){
+				guest.setMood(MoodType.neutral);
 			} else if(name != "tennis") {
-				guest.setMood("sad");
+				guest.setMood(MoodType.sad);
 			}
 		}
 		if(name != "tennis" || guests.length == 2) {
-			if(time % happinessAddedTime == 0 && guest.getMood() == "happy") {
+			if(time % happinessAddedTime == 0 && guest.getMood() == MoodType.happy) {
 				guest.happiness += happinessAdded;
-			} else if(time % sadnessAddedTime == 0 && guest.getMood() == "sad") {
+			} else if(time % sadnessAddedTime == 0 && guest.getMood() == MoodType.sad) {
 				guest.happiness -= sadnessAdded;
 			}
 		} else {
-			if(time % 3 == 0 && guest.getMood() == "happy") {
+			if(time % 3 == 0 && guest.getMood() == MoodType.happy) {
 				guest.happiness += 1;
-			} else if(time % 3 == 0 && guest.getMood() == "sad") {
+			} else if(time % 3 == 0 && guest.getMood() == MoodType.sad) {
 				guest.happiness -= 2;
 			}
 		}
@@ -207,13 +208,13 @@ class Activity extends FlxSprite {
 	 * @param	activityTime	How long has this guest done this activity
 	 * @return	The mood of the guest.  'happy', 'neutral', 'sad'
 	 */
-	public function getMood(activityTime:Float):String {
+	public function getMood(activityTime:Float):MoodType {
 		//If the guest has spent longer than the total happy and sad times, they are sad.
 		if (activityTime >= happinessAddedTime + sadnessAddedTime)
-			return 'sad';
+			return MoodType.sad;
 		else if (activityTime >= happinessAddedTime)
-			return 'neutral';
+			return MoodType.neutral;
 		else
-			return 'happy';
+			return MoodType.happy;
 	}
 }
