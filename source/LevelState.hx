@@ -68,7 +68,7 @@ class LevelState extends FlxState
 		activityGroup = new FlxTypedGroup<Activity>();
 		heldGuest = null;
 		
-		bg = new FlxSprite(0, 0, 'assets/images/bg.png');
+		bg = new FlxSprite(0, 0, 'assets/images/bg1.png');
 		add(bg);
 		var maxX = 368;
 		var x = 80;

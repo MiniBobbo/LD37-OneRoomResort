@@ -3,10 +3,11 @@ import flixel.input.mouse.FlxMouseEventManager;
 import flixel.FlxG;
 import flixel.util.FlxColor;
 import flixel.math.FlxPoint;
+import types.ActivityTypes;
 
 class Activity extends FlxSprite {
 	var name: String;
-	var type: String;
+	var type: ActivityTypes;
 
 	var energyPerSecond: Float;
 
@@ -45,16 +46,16 @@ class Activity extends FlxSprite {
 		}
 
 		if(name == "nothing") {
-			type = 'nothing';
+			type = ActivityTypes.nothing;
 			energyPerSecond = 1;
-			happinessAdded = 1;
+			happinessAdded = 0;
 			happinessAddedTime = 3;
 			sadnessAdded = 2;
 			sadnessAddedTime = 3;
 			unhappinessThreshhold = 5;
 			capacity = 100;
 		} else if(name == "pool") {
-			type = 'relaxation';
+			type = ActivityTypes.relaxation;
 			energyPerSecond = 2;
 			happinessAdded = 2;
 			happinessAddedTime = 2;
@@ -70,7 +71,7 @@ class Activity extends FlxSprite {
 			positions.push(new FlxPoint(x + 55, y + 38));
 			flipField = ["normal", "normal", "normal", "flipped", "flipped", "flipped"];
 		} else if(name == "tennis") {
-			type = 'exercise';
+			type = ActivityTypes.exercise;
 			energyPerSecond = 3;
 			happinessAdded = 3;
 			happinessAddedTime = 2;
@@ -82,7 +83,7 @@ class Activity extends FlxSprite {
 			flipField = ["normal", "flipped"];
 			capacity = 2;
 		} else if(name == "spa") {
-			type = 'relaxation';
+			type = ActivityTypes.relaxation;
 			energyPerSecond = 1;
 			happinessAdded = 2;
 			happinessAddedTime = 2;
@@ -94,7 +95,7 @@ class Activity extends FlxSprite {
 			flipField = ["normal", "flipped"];
 			capacity = 2;
 		} else if(name == "room") {
-			type = 'sleep';
+			type = ActivityTypes.sleep;
 			energyPerSecond = -5;
 			happinessAdded = 2;
 			happinessAddedTime = 2;
@@ -183,5 +184,36 @@ class Activity extends FlxSprite {
 				guest.happiness -= 2;
 			}
 		}
+	}
+	
+	/**
+	 * Is this activity currently valid?  For instance, are there two people playing tennis?
+	 * @return	True if yes.  Otherwise false
+	 */
+	public function activityActive():Bool {
+		switch (name) 
+		{
+			case 'tennis':
+				if (guests.length == 2)
+				return true;
+				return false;
+			default:
+				return true;
+		}
+	}
+	
+	/**
+	 * Gets what the guest's current mood should be based on how long they have done this activity.  
+	 * @param	activityTime	How long has this guest done this activity
+	 * @return	The mood of the guest.  'happy', 'neutral', 'sad'
+	 */
+	public function getMood(activityTime:Float):String {
+		//If the guest has spent longer than the total happy and sad times, they are sad.
+		if (activityTime >= happinessAddedTime + sadnessAddedTime)
+			return 'sad';
+		else if (activityTime >= happinessAddedTime)
+			return 'neutral';
+		else
+			return 'happy';
 	}
 }
