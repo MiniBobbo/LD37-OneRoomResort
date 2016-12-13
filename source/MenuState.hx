@@ -34,7 +34,7 @@ class MenuState extends FlxState
 	
 	private function clickStart() {
 
-		var level:LevelState = new LevelState(H.levels[0]);
+		var level:LevelState = new LevelState(H.levels[1]);
 		FlxG.switchState(level);
 	}
 	

@@ -24,10 +24,16 @@ class Guest extends FlxSprite {
 
 	var energyBar:FlxBar;
 	var happinessBar:FlxBar;
+	var wantBubble:FlxSprite;
 
 	var animCounter: Float;
 	var timeToNextAnim: Float;
 	var timeInCurActivity: Float;
+	
+	//Stores the idle time and the idle state.
+	var idle:Bool;
+	var idleTime:Float;
+	
 	public var flipped: String;
 
 	public var happiness: Float;
@@ -43,9 +49,11 @@ class Guest extends FlxSprite {
 		type = gender;
 		
 		energyBar = new FlxBar(x - 5, y - 10, 42, 2, this, "energy", 0, 100);
-		energyBar.createColoredFilledBar(FlxColor.BLUE);
+		energyBar.createColoredFilledBar(FlxColor.CYAN);
+		energyBar.createColoredEmptyBar(FlxColor.BLACK);
 		happinessBar = new FlxBar(x - 5, y - 5, 42, 2, this, "happiness", 0, 100);
 		happinessBar.createColoredFilledBar(FlxColor.RED);
+		happinessBar.createColoredEmptyBar(FlxColor.BLACK);
 
 		this.loadGraphic('assets/images/'+ type+ '.png', true, 32, 32);
 
@@ -135,7 +143,7 @@ class Guest extends FlxSprite {
 					lastPoint.x = x;
 					lastPoint.y = y;
 					if(curActivity.getName() != prevActivity.getName()) {
-						setMood(MoodType.happy);
+						//setMood(MoodType.happy);
 						timeInCurActivity = 0;	
 					}
 					playAnimation();
@@ -148,12 +156,52 @@ class Guest extends FlxSprite {
 	override public function update(elapsed: Float) {
 		super.update(elapsed);
 
-		var timeInSecs:Int = Math.floor(timeInCurActivity);
-		timeInCurActivity += elapsed;
-		if(Math.floor(timeInCurActivity) > timeInSecs) {
-			curActivity.updateGuest(this, timeInSecs);
+		//Replaced this so the guest manages its own happiness so later wants can be implemented more easily.
+		//var timeInSecs:Int = Math.floor(timeInCurActivity);
+		//timeInCurActivity += elapsed;
+		//if(	Math.floor(timeInCurActivity) > timeInSecs) {
+			//curActivity.updateGuest(this, timeInSecs);
+		//}
+		
+		//When a guest is in an activity they are either idle or active.  
+		//Idle means that the idle time counter goes up.  Remaining idle for too long makes guests unhappy.
+		//Active means that the guest gains/loses energy/happiness based on the activity.
+		
+		//Check if this activity is valid.
+		var newidle:Bool = curActivity.activityActive();
+		//If the idle state changed, do something.
+		if (newidle != idle) {
+			idle = newidle;
+			//If we just became idle, reset the idle counter.
+			if (idle) {
+				idleTime = 0;
+			} 
+		}
+		
+		//If we are idle, start the idle counter.
+		if (idle) {
+			idleTime += elapsed;
+			//Get the idle time based on the activity (which is actually all the same).
+			var m:MoodType = curActivity.getIdleMood(idleTime);
+			//If the moods are different, set the mood to be the new current one.
+			setMood(m);
+		} else {
+			timeInCurActivity += elapsed;
+			var m:MoodType = curActivity.getMood(timeInCurActivity);
+			//If the moods are different, set the mood to be the new current one.
+			setMood(m);
+			
 		}
 
+		//We should now have the idle and mood set correctly.  Now do the math and change happiness and energy.
+		if (idle) {
+			happiness += curActivity.getIdleHappiness(curMood) * elapsed;
+			energy -= curActivity.getEnergy() * elapsed;
+		} else {		
+			happiness += curActivity.getHappiness(curMood) * elapsed;
+			energy -= curActivity.getEnergy()* elapsed;
+		}
+		
 		animCounter += elapsed;
 		if(animCounter > timeToNextAnim) {
 			playAnimation();
@@ -199,9 +247,11 @@ class Guest extends FlxSprite {
 	}
 
 	public function setMood(newMood: MoodType) {
-		lastMood = curMood;
-		curMood = newMood;
-		playAnimation();
+		if(curMood != newMood) {
+			lastMood = curMood;
+			curMood = newMood;
+			playAnimation();
+		}
 	}
 
 	public function getMood(): MoodType {

@@ -74,6 +74,7 @@ class EmailSubstate extends FlxSubState
 				ease:FlxEase.quadInOut, 
 				onComplete: function(_) {
 					if (end) {
+						//If this is an ending substate, call endLevel on the parent.  
 						cast(this._parentState, LevelState).endLevel();
 					} else 
 					this._parentState.closeSubState();

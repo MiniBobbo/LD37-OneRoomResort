@@ -45,7 +45,6 @@ class LevelState extends FlxState
 	{
 		super.create();
 
-		FlxG.watch.add(H, 'subStateClosed');
 		
 		//Initialize the emot group
 		emoteGroup = new FlxTypedGroup<Emot>();
@@ -92,7 +91,7 @@ class LevelState extends FlxState
 			var x = rand.int(0, 60);
 			var y = rand.int(0, FlxG.height - 40);
 			var genders = ["guest", "guestfemale"];
-			var gender = genders[rand.int(0, 1)];
+			var gender = genders[rand.int(0, genders.length-1)];
 			var guest: Guest;
 			guest = new Guest(x, y, gender);
 			add(guest.getEnergyBar());
@@ -110,6 +109,23 @@ class LevelState extends FlxState
 		add(timerText);
 		add(emoteGroup);
 		//openSubState(new EmailSubstate('Dave', 'Izzybelle', 'I want food!', 'Feed me human!'));
+		
+		//Set up watches for all the guest variables
+		//for (i in 0...guestGroup.length) {
+			//FlxG.watch.add(guestGroup.members[i], 'happiness', 'Guest ' + i + ' H:');
+			//FlxG.watch.add(guestGroup.members[i], 'energy', 'Guest ' + i + ' E:');
+			//FlxG.watch.add(guestGroup.members[i], 'idle', 'Guest ' + i + ' I:');
+			//FlxG.watch.add(guestGroup.members[i], 'idleTime', 'Guest ' + i + ' IT:');
+			//FlxG.watch.add(guestGroup.members[i], 'curMood', 'Guest ' + i + ' M:');
+			//FlxG.watch.add(guestGroup.members[i], 'timeInCurActivity', 'Guest ' + i + ' CA:');
+			//
+		//}
+		for (a in activityGroup) {
+			FlxG.watch.add(a, 'name');
+			FlxG.watch.add(a, 'guests');
+			
+		}
+		
 	}
 
 	public function getTimeText(timeRemaining: Float): String {
@@ -150,18 +166,13 @@ class LevelState extends FlxState
 		
 		timeRemaining -= elapsed;
 		
-		//TODO: Level End state
 		if (timeRemaining <= 0) {
 			//Create the end of level email and display it.
 			if (levelInfo.endEmail != null) {
 				var ss:EmailSubstate = new EmailSubstate(levelInfo.endFrom, levelInfo.endTo, levelInfo.endSubject, levelInfo.endEmail, true);
-				FlxG.log.add('Should be transitioning to substate');
 				openSubState(ss);
 			} else
 			endLevel();
-		
-			
-			
 		}
 		
 

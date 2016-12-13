@@ -34,7 +34,7 @@ class H
 			name:'Starting Out',
 			guests:3,
 			activities:['room', 'pool', 'spa'],
-			gameLength:30,
+			gameLength:45,
 			
 			startTo:'activities@oneroomresort.com',
 			startFrom:'TheBossMan@oneroomresort.com',

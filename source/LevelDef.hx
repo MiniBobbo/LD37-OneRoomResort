@@ -16,6 +16,12 @@ typedef LevelDef =
 	//Game time in seconds
 	var gameLength:Float;
 	
+	//Wants
+	@:optional var wantBaseTime:Float;
+	@:optional var wantVariableTime:Float;
+	@:optional var wantList:Array<ActivityTypes>;
+	
+	
 	//Starting email settings
 	@:optional var startTo:String;
 	@:optional var startFrom:String;

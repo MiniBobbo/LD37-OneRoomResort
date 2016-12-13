@@ -51,7 +51,7 @@ class Activity extends FlxSprite {
 			energyPerSecond = 1;
 			happinessAdded = 0;
 			happinessAddedTime = 5;
-			sadnessAdded = 2;
+			sadnessAdded = -2;
 			sadnessAddedTime = 10;
 			unhappinessThreshhold = 5;
 			capacity = 100;
@@ -60,8 +60,8 @@ class Activity extends FlxSprite {
 			energyPerSecond = 2;
 			happinessAdded = 2;
 			happinessAddedTime = 10;
-			sadnessAdded = 2;
-			sadnessAddedTime = 2;
+			sadnessAdded = -2;
+			sadnessAddedTime = 10;
 			capacity = 6;
 			unhappinessThreshhold = 10;
 			positions.push(new FlxPoint(x + 5, y + 20));
@@ -75,9 +75,9 @@ class Activity extends FlxSprite {
 			type = ActivityTypes.exercise;
 			energyPerSecond = 3;
 			happinessAdded = 3;
-			happinessAddedTime = 2;
-			sadnessAdded = 2;
-			sadnessAddedTime = 2;
+			happinessAddedTime = 100;
+			sadnessAdded = -2;
+			sadnessAddedTime = 30;
 			unhappinessThreshhold = 15;
 			positions.push(new FlxPoint(x + 10, y + 20));
 			positions.push(new FlxPoint(x + 60, y + 20));
@@ -87,9 +87,9 @@ class Activity extends FlxSprite {
 			type = ActivityTypes.relaxation;
 			energyPerSecond = 1;
 			happinessAdded = 2;
-			happinessAddedTime = 2;
-			sadnessAdded = 2;
-			sadnessAddedTime = 2;
+			happinessAddedTime = 15;
+			sadnessAdded = -2;
+			sadnessAddedTime = 10;
 			unhappinessThreshhold = 10;
 			positions.push(new FlxPoint(x, y + 25));
 			positions.push(new FlxPoint(x + 70, y + 12));
@@ -99,9 +99,9 @@ class Activity extends FlxSprite {
 			type = ActivityTypes.sleep;
 			energyPerSecond = -5;
 			happinessAdded = 2;
-			happinessAddedTime = 2;
-			sadnessAdded = 2;
-			sadnessAddedTime = 2;
+			happinessAddedTime = 100;
+			sadnessAdded = 0;
+			sadnessAddedTime = 100;
 			positions.push(new FlxPoint(x + 5, y + 25));
 			flipField = ["normal"];
 			capacity = 1;
@@ -143,18 +143,14 @@ class Activity extends FlxSprite {
 			}
 		}
 		guests.push(guest);
-		if(name == "tennis") {
-			if(guests.length == 1) {
-				guest.setMood(MoodType.sad);
-			} else {
-				for(g in guests) {
-					g.setMood(MoodType.happy);
-				}
-			}
-		}
 		return true;
 	}
 
+	/**
+	 * DEPRECIATED.  This logic was moved to the guest object.  
+	 * @param	guest
+	 * @param	time
+	 */
 	public function updateGuest(guest:Guest, time: Int) {
 		if(name != "tennis" || guests.length == 2) {
 			guest.energy -= energyPerSecond;
@@ -195,11 +191,15 @@ class Activity extends FlxSprite {
 		switch (name) 
 		{
 			case 'tennis':
-				if (guests.length == 2)
+				if (guests.length == 2) {
+					return false;
+				}
 				return true;
-				return false;
+			case 'nothing':
+				return true;
+				
 			default:
-				return true;
+				return false;
 		}
 	}
 	
@@ -216,5 +216,52 @@ class Activity extends FlxSprite {
 			return MoodType.neutral;
 		else
 			return MoodType.happy;
+	}
+	
+	/**
+	 * What is the guests current mood based on how long they have been idle?
+	 * @param	idleTime	
+	 * @return	Mood of guest.  happy, neutral, or sad
+	 */
+	public function getIdleMood(idleTime:Float):MoodType {
+		//TODO: Better way to set idle time.  Now it is hard coded.
+		
+		//How long should a guest wait before becoming sad when idle?
+		if (idleTime > 4) 
+			return MoodType.sad;
+		return MoodType.neutral;
+	}
+	
+	/**
+	 * Returns the change in happiness for this activity, based on the mood.
+	 * @param	mood	The guest's current mood.
+	 * @return	The change in happiness. 
+	 */
+	public function getHappiness(mood:MoodType):Float {
+		switch (mood) 
+		{
+			case MoodType.happy:
+				return happinessAdded;
+			case MoodType.sad:
+				return sadnessAdded;
+			default:
+				return 0;
+				
+		}
+	}
+	
+	public function getEnergy():Float {
+		return energyPerSecond;
+	}
+	
+	public function getIdleHappiness(mood:MoodType):Float {
+		switch (mood) 
+		{
+			case MoodType.sad:
+				return -2;
+			default:
+				return 0;
+				
+		}
 	}
 }
