@@ -72,7 +72,7 @@ class LevelEndState extends FlxState
 		var bg = new FlxSprite(0, 0, 'assets/images/bg1.png');
 		bg.alpha = .5;
 
-		titleText= new FlxText(titleOffset.x, titleOffset.y, FlxG.width, info.levelName + " Completed!", 30);
+		titleText= new FlxText(titleOffset.x, titleOffset.y, FlxG.width, info.levelName + " Completed!", 26);
 		titleText.setFormat(null, 30, FlxColor.WHITE, FlxTextAlign.CENTER);
 
 		wsr = new FlxSprite(250, 0);
@@ -107,7 +107,7 @@ class LevelEndState extends FlxState
 		{
 			var s = new FlxSprite(guestsOffset.x, (spaceBetweenGuests * i));
 			//Load the animations.
-			s.loadGraphic('assets/images/guest.png', true, 32, 32);
+			s.loadGraphic('assets/images/'+ info.guestType[i] +'.png', true, 32, 32);
 			s.animation.add('happy', [0]);
 			s.animation.add('neutral', [2]);
 			s.animation.add('sad', [4]);
@@ -126,13 +126,14 @@ class LevelEndState extends FlxState
 		add(titleText);
 		add(sg);
 
-		btnBack = new FlxButton(buttonBackLocation.x, buttonBackLocation.y, "BACK", mainMenu);
+		btnBack = new FlxButton(buttonBackLocation.x, buttonBackLocation.y, "MENU", mainMenu);
 		btnRetry = new FlxButton(buttonRetryLocation.x, buttonRetryLocation.y, "RETRY", retryLevel);
 		btnNext = new FlxButton(buttonNextLocation.x, buttonNextLocation.y, "NEXT", nextLevel);
 
 		pushOffscreen();
 
 		add(btnBack);
+		if(info.level != H.levels.length)
 		add(btnNext);
 		add(btnRetry);
 
@@ -175,13 +176,16 @@ class LevelEndState extends FlxState
 
 	private function nextLevel()
 	{
+		FlxG.switchState(new LevelState(H.levels[info.level]));
 	}
 
 	private function mainMenu()
 	{
+		FlxG.switchState(new MenuState());
 	}
 
 	private function retryLevel()
 	{
+		FlxG.switchState(new LevelState(H.levels[info.level-1]));
 	}
 }
