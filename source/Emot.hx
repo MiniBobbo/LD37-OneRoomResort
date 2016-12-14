@@ -19,15 +19,20 @@ class Emot extends FlxSprite
 		loadGraphic('assets/images/emot.png', true);
 		animation.add('sad', [0]);
 		animation.add('happy', [1]);
+		animation.add('energy', [2]);
+		
 	}
 	
 	/**
 	 * Spawns an emot for this guest.
 	 * @param	guest
 	 */
-	public function spawn(guest:Guest) {
+	public function spawn(guest:Guest, emot:String = '') {
 		reset(guest.x + (guest.width / 2), guest.y + (guest.height / 2));
-		animation.play(guest.getMood() );
+		if (emot != '')
+		animation.play(emot);
+		else
+		animation.play(guest.getMood()+ '' );
 		acceleration.y -= 10 + FlxG.random.float(0, 30);
 		velocity.set();
 		velocity.x = FlxG.random.float( -10, 10);

@@ -117,7 +117,7 @@ class LevelEndState extends FlxState
 				s.animation.play('neutral');
 			if (info.guestHappiness[i] <= 50)
 				s.animation.play('sad');
-			var t:FlxText = new FlxText(guestsOffset.x + happinessOffset, (spaceBetweenGuests * i), 0, 'Happiness: ' + info.guestHappiness[i], 10);
+			var t:FlxText = new FlxText(guestsOffset.x + happinessOffset, (spaceBetweenGuests * i), 0, 'Happiness: ' + Std.int(info.guestHappiness[i]), 10);
 			sg.add(s);
 			sg.add(t);
 		}
