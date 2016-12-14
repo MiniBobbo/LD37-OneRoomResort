@@ -1,4 +1,7 @@
 package;
+import defs.EmotDef;
+import defs.LevelDef;
+import types.ActivityTypes;
 
 /**
  * ...
@@ -10,16 +13,18 @@ class H
 	//This is a hacky way around the substate being closed problem.
 	public static var subStateClosed:Bool = false;
 	
-	public static var levels:Array<LevelDef>;
-	public static var emotions:Array<Guest>;
+	public static var levels:Array<defs.LevelDef>;
+	public static var emotions:Array<EmotDef>;
 	
 	
 	/**
 	 * Puts this guest in the queue to have an emotion spawn this turn.
 	 * @param	guest
 	 */
-	public static function spawnEmotion(guest:Guest) {
-		emotions.push(guest);
+	public static function spawnEmotion(guest:Guest, emot:String = '') {
+		emotions.push( { 
+			guest:guest,
+			emot:emot});
 	}
 	
 	/**
@@ -97,7 +102,29 @@ class H
 			endSubject:'re: Another spa?  Seriously?',
 			endEmail:"Hi Susan!\nI'm noticing a little frustration in your last email.  I feel like we haven't been communicating well, so I've taken the liberty of signing you up for a wonderful class my brother teaches called 'Communicating in the Workplace' because, just between the two of us, communication isn't your strong point.  Don't worry though!  We all have areas we can improve!!\n\nJust to make sure I address your concerns I re-read your email very carefully.  I love your idea of adding anther spa!!!  I'll call the contractors.\n\nChad 'The Boss' Huntington"
 		});
-		
+
+		levels.push( {
+			levelNum:5,
+			name:'Pushy Guests',
+			guests:5,
+			activities:['room', 'pool', 'spa', 'tennis', 'spa'],
+			gameLength:90,
+			
+			wantBaseTime:5,
+			wantVariableTime:10,
+			wantList:[ActivityTypes.relaxation, ActivityTypes.exercise],
+			wantGuestTimeLimit:5,
+			
+			startTo:'activities@oneroomresort.com',
+			startFrom:'TheBossMan@oneroomresort.com',
+			startSubject:'VIPs coming this week!',
+			startEmail:"Hey Susan!!!,\n\nI just wanted to drop a note to say thanks for what a great job you are doing!  Last week was a little crazy, huh?  All those guests!  Wow!  The great news is that THIS week will be much easier.  Only a few guests.  I've taken some of the activity areas down for maintenance, but I'm sure you will find stuff for everyone to do!\n\nI probably should mention that this week we have some particularly picky guests coming.  Don't be surprised if they make requests for different activities.  Meeting a guest's wants give them a happiness and energy boost, so be sure to get to them as soon as possible.  There are other benefits to meeting the wants of the guests.  For instance, the intense feeling of satisfaction you get for a job well done.  \n\nDo your best to accomodate them!\n\nChad 'The Boss' Huntington",
+			endTo:'activities@oneroomresort.com',
+			endFrom:'HR@competingresorts.com',
+			endSubject:'Your Inquiry',
+			endEmail:"Hi Susan,\nThanks for your interest in a job at Competing Resorts!  I am just writing to let you know that we received your resume and will be reviewing it shortly.  Someone should be reaching out to you in the next week or two to set up an interview.  \n\nHarold Finch\nHR Representative\nCompetingResorts.com"
+		});
+
 	}
 	
 }

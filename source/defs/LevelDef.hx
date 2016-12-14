@@ -1,5 +1,6 @@
-package;
+package defs;
 
+import types.ActivityTypes;
 /**
  * @author Dave
  */
@@ -20,6 +21,7 @@ typedef LevelDef =
 	@:optional var wantBaseTime:Float;
 	@:optional var wantVariableTime:Float;
 	@:optional var wantList:Array<ActivityTypes>;
+	@:optional var wantGuestTimeLimit:Float;
 	
 	
 	//Starting email settings

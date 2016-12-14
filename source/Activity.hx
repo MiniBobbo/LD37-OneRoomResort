@@ -264,4 +264,8 @@ class Activity extends FlxSprite {
 				
 		}
 	}
+	
+	public function getType():ActivityTypes {
+		return type;
+	}
 }

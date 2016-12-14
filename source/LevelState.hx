@@ -1,5 +1,7 @@
 package;
 
+import defs.EmotDef;
+import defs.LevelDef;
 import defs.LevelEndDef;
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -11,6 +13,7 @@ import flixel.math.FlxPoint;
 import flixel.math.FlxRandom;
 import flixel.text.FlxText;
 import flixel.ui.FlxBar;
+import types.ActivityTypes;
 import types.MoodType;
 /**
  * ...
@@ -33,9 +36,13 @@ class LevelState extends FlxState
 	var emoteGroup:FlxTypedGroup<Emot>;
 	
 	public static var activityGroup:FlxTypedGroup<Activity>;
-	var levelInfo:LevelDef;
+	var levelInfo:defs.LevelDef;
 
-	override public function new(levelInfo: LevelDef):Void {
+	//Want variables
+	var wantTimer:Float;
+	var wants:Bool = false;
+	
+	override public function new(levelInfo: defs.LevelDef):Void {
 		super();
 		this.levelInfo = levelInfo;
 		H.subStateClosed = false;
@@ -50,7 +57,7 @@ class LevelState extends FlxState
 		emoteGroup = new FlxTypedGroup<Emot>();
 		
 		//Create a bunch of emots.
-		for (i in 0...50) {
+		for (i in 0...100) {
 			var s = new Emot();
 			s.kill();
 			emoteGroup.add(s);
@@ -67,6 +74,12 @@ class LevelState extends FlxState
 		guestGroup = new FlxTypedGroup<Guest>();
 		activityGroup = new FlxTypedGroup<Activity>();
 		heldGuest = null;
+		
+		if (levelInfo.wantList != null && levelInfo.wantList.length > 0) {
+			wants = true;
+			wantTimer = levelInfo.wantBaseTime + FlxG.random.float(0,levelInfo.wantVariableTime);
+		} else
+		wantTimer = 0;
 		
 		bg = new FlxSprite(0, 0, 'assets/images/bg1.png');
 		add(bg);
@@ -90,19 +103,22 @@ class LevelState extends FlxState
 		for(i in 0...levelInfo.guests) {
 			var x = rand.int(0, 60);
 			var y = rand.int(0, FlxG.height - 40);
-			var genders = ["guest", "guestfemale"];
+			var genders = ["guestfemale", "guestfemale"];
 			var gender = genders[rand.int(0, genders.length-1)];
 			var guest: Guest;
 			guest = new Guest(x, y, gender);
+			guest.setPosition(x, y);
 			add(guest.getEnergyBar());
 			add(guest.getHappinessBar());
+			add(guest.getWantBubble());
 
 			guestGroup.add(guest);
 		}
 
-		for (g in guestGroup) {
-			add(g);
-		}
+		add(guestGroup);
+		//for (g in guestGroup) {
+			//add(g);
+		//}
 
 		timeRemaining = levelInfo.gameLength;
 		timerText = new FlxText(FlxG.width - 50, FlxG.height - 20, 0,getTimeText(timeRemaining), 16);
@@ -151,20 +167,37 @@ class LevelState extends FlxState
 
 		//Check the emotion spawn queue and spawn any important emotions.
 		for (i in 0...H.emotions.length) {
-			var g = H.emotions.pop();
-			if (g.getMood() == MoodType.happy && g.curActivity.getName() != 'nothing') {
-				//TODO  Add an icon spawn here.
-				emoteGroup.getFirstAvailable().spawn(g);
-				FlxG.sound.play('assets/sounds/hearts.wav', .1);
-			} else if (g.getMood() == MoodType.sad) {
-				emoteGroup.getFirstAvailable().spawn(g);
-				FlxG.sound.play('assets/sounds/sad.wav', .1);
+			//TODO:  Going over max emotes causes a crash.  Fix this.
+			var e:EmotDef = H.emotions.pop();
+			var g:Guest = e.guest;
+			//If the emot isn't blank, play that emote instead of getting the guest happiness..
+			var emote = emoteGroup.getFirstAvailable();
+			if(e != null) {
+			if (e.emot != '') {
+				emote.spawn(g,e.emot);
+				}
+				else if (g.getMood() == MoodType.happy && g.curActivity.getName() != 'nothing') {
+					//TODO  Add an icon spawn here.
+					emote.spawn(g);
+					FlxG.sound.play('assets/sounds/hearts.wav', .1);
+				} else if (g.getMood() == MoodType.sad) {
+					emote.spawn(g);
+					FlxG.sound.play('assets/sounds/sad.wav', .1);
+				}
 			}
-			
 		}
 		
 		
 		timeRemaining -= elapsed;
+		
+		//Calculate if a want should be generated
+		if (wants) {
+			wantTimer -= elapsed;
+			//If the timer has expired, generate a want.  
+			if (wantTimer <= 0) {
+				generateWant();
+			}
+		}
 		
 		if (timeRemaining <= 0) {
 			//Create the end of level email and display it.
@@ -209,5 +242,23 @@ class LevelState extends FlxState
 			//If there is no substate open, go to the end state.
 			if (H.subStateClosed)
 				FlxG.switchState(endState);
+	}
+	
+	/**
+	 * Generates a want from the list for one of the guests.
+	 */
+	private function generateWant() {
+		//Try 10 times to find a guest without a want.  If not, just give up and try again next loop.  
+		for (i in 0...10) {
+			var g:Guest = guestGroup.getRandom();
+			if (g.want == ActivityTypes.nothing) {
+				g.createWant(levelInfo.wantList[FlxG.random.int(0, levelInfo.wantList.length - 1)], levelInfo.wantGuestTimeLimit);
+				break;
+			}
+				
+		}
+		
+		wantTimer = levelInfo.wantBaseTime + FlxG.random.float(0, levelInfo.wantVariableTime);
+		
 	}
 }

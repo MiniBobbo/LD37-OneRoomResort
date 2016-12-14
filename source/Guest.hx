@@ -8,6 +8,7 @@ import flixel.math.FlxPoint;
 import flixel.math.FlxRandom;
 import flixel.ui.FlxBar;
 import flixel.util.FlxColor;
+import types.ActivityTypes;
 import types.MoodType;
 
 class Guest extends FlxSprite {
@@ -24,7 +25,14 @@ class Guest extends FlxSprite {
 
 	var energyBar:FlxBar;
 	var happinessBar:FlxBar;
+	
+	public var want:ActivityTypes;
 	var wantBubble:FlxSprite;
+	var wantBubbuelOffset:FlxPoint;
+	var wantTimer:Float;
+	
+	var wantEnergyAdd:Float = 10;
+	var wantHappinessAdd:Float = 10;
 
 	var animCounter: Float;
 	var timeToNextAnim: Float;
@@ -55,6 +63,16 @@ class Guest extends FlxSprite {
 		happinessBar.createColoredFilledBar(FlxColor.RED);
 		happinessBar.createColoredEmptyBar(FlxColor.BLACK);
 
+		
+		want = ActivityTypes.nothing;
+		wantBubble = new FlxSprite(0, 0);
+		wantBubble.loadGraphic('assets/images/wants.png', true, 32, 32);
+		wantBubble.animation.add('sleep', [0]);
+		wantBubble.animation.add('exercise', [1]);
+		wantBubble.animation.add('relaxation', [2]);
+		wantBubble.visible = false;
+		wantBubbuelOffset = new FlxPoint(32,-10);
+		
 		this.loadGraphic('assets/images/'+ type+ '.png', true, 32, 32);
 
 		curMood = MoodType.happy;
@@ -137,14 +155,20 @@ class Guest extends FlxSprite {
 				if(!a.addGuest(this)) {
 					setPosition(lastPoint.x, lastPoint.y);
 				} else {
+					//If this activity meets the want, clear the want from the guest.
+					if (want != ActivityTypes.nothing && want == a.getType()) {
+						clearWant();
+	
+						
+					}
+					
 					prevActivity = curActivity;
 					curActivity.removeGuest(this);
 					curActivity = a;
 					lastPoint.x = x;
 					lastPoint.y = y;
 					if(curActivity.getName() != prevActivity.getName()) {
-						//setMood(MoodType.happy);
-						timeInCurActivity = 0;	
+						timeInCurActivity = 0;
 					}
 					playAnimation();
 				}
@@ -178,8 +202,13 @@ class Guest extends FlxSprite {
 			} 
 		}
 		
-		//If we are idle, start the idle counter.
-		if (idle) {
+		if (want != ActivityTypes.nothing)
+			wantTimer -= elapsed;
+		
+		//If a guest has a want that isn't met over the want limit, make their mood automatically sad.
+		if (want != ActivityTypes.nothing && wantTimer <= 0)
+			setMood(MoodType.sad);
+		else if (idle) {
 			idleTime += elapsed;
 			//Get the idle time based on the activity (which is actually all the same).
 			var m:MoodType = curActivity.getIdleMood(idleTime);
@@ -234,6 +263,7 @@ class Guest extends FlxSprite {
 	override function setPosition(X: Float = 0, Y: Float = 0) {
 		super.setPosition(X, Y);
 		updateBarPositions();
+		wantBubble.setPosition(X + wantBubbuelOffset.x, Y + wantBubbuelOffset.y);
 	}
 
 	private function updateBarPositions() {
@@ -257,4 +287,31 @@ class Guest extends FlxSprite {
 	public function getMood(): MoodType {
 		return curMood;
 	} 
+	
+	public function createWant(want:ActivityTypes, wantTime:Float) {
+		FlxG.log.add('Created want: ' + want);
+		this.want = want;
+		wantTimer = wantTime;
+		wantBubble.animation.play(want+'');
+		wantBubble.visible = true;
+	}
+	
+	public function clearWant() {
+		want = ActivityTypes.nothing;
+		wantTimer = 0;
+		wantBubble.visible = false;
+		
+		//Add the want energy and happiness.
+		energy += wantEnergyAdd;
+		happiness += wantHappinessAdd;
+		//Spawn some emots for meeting the want.
+		for (i in 0...3) {
+			H.spawnEmotion(this, 'energy');
+			H.spawnEmotion(this);
+		}
+	}
+	
+	public function getWantBubble():FlxSprite {
+		return wantBubble;
+	}
 }
