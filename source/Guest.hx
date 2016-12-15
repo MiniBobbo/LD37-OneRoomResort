@@ -15,7 +15,7 @@ class Guest extends FlxSprite {
 	var beingDragged:Bool = false;
 	var dragOffset:FlxPoint;
 
-	var lastPoint: FlxPoint;
+	public var lastPoint: FlxPoint;
 
 	var totalTime: Float;
 
@@ -36,7 +36,7 @@ class Guest extends FlxSprite {
 
 	var animCounter: Float;
 	var timeToNextAnim: Float;
-	var timeInCurActivity: Float;
+	public var timeInCurActivity: Float;
 	
 	//Stores the idle time and the idle state.
 	var idle:Bool;
@@ -49,7 +49,7 @@ class Guest extends FlxSprite {
 	public var type:String;
 	
 	public var curActivity: Activity;
-	var prevActivity: Activity;
+	public var prevActivity: Activity;
 
 	override public function new(x: Float, y: Float, gender: String) {
 		super(x, y);
@@ -92,9 +92,15 @@ class Guest extends FlxSprite {
 		animation.add('neutraltennisnormal', [15, 14], frameTime, false);
 		animation.add('sadtennisnormal', [14], frameTime, false);
 		animation.add('happyroomnormal', [17, 16], frameTime, false);
+		animation.add('neutralroomnormal', [17, 16], frameTime, false);
+		animation.add('sadroomnormal', [17, 16], frameTime, false);
 		animation.add('happyspanormal', [19, 18], frameTime, false);
 		animation.add('neutralspanormal', [21, 20], frameTime, false);
 		animation.add('sadspanormal', [23, 22], frameTime, false);
+		animation.add('happycoffeenormal', [25, 24], frameTime, false);
+		animation.add('neutralcoffeenormal', [25, 24], frameTime, false);
+		animation.add('sadcoffeenormal', [25, 24], frameTime, false);
+		
 
 		animation.add('happynothingflipped', [1, 0], frameTime, false, true);
 		animation.add('neutralnothingflipped', [3, 2], frameTime, false, true);
@@ -109,6 +115,9 @@ class Guest extends FlxSprite {
 		animation.add('happyspaflipped', [19, 18], frameTime, false, true);
 		animation.add('neutralspaflipped', [21, 20], frameTime, false, true);
 		animation.add('sadspaflipped', [23, 22], frameTime, false, true);
+		animation.add('happycoffeeflipped', [25, 24], frameTime, false, true);
+		animation.add('neutralcoffeeflipped', [25, 24], frameTime, false, true);
+		animation.add('sadcoffeeflipped', [25, 24], frameTime, false, true);
 
 
 		lastPoint = new FlxPoint(x, y);
@@ -136,6 +145,9 @@ class Guest extends FlxSprite {
 
 
 	private function onPress(Sprite:FlxSprite) {
+		if (!curActivity.canGuestLeave())
+		return;
+		
 		dragOffset = FlxPoint.get(x - FlxG.mouse.x, y - FlxG.mouse.y);
 		beingDragged = true;
 		if(curActivity != null) {
@@ -158,8 +170,6 @@ class Guest extends FlxSprite {
 					//If this activity meets the want, clear the want from the guest.
 					if (want != ActivityTypes.nothing && want == a.getType()) {
 						clearWant();
-	
-						
 					}
 					
 					prevActivity = curActivity;
@@ -222,6 +232,9 @@ class Guest extends FlxSprite {
 			
 		}
 
+		//Do we need to be kicked from the current activity?
+		curActivity.kickMe(this);
+		
 		//We should now have the idle and mood set correctly.  Now do the math and change happiness and energy.
 		if (idle) {
 			happiness += curActivity.getIdleHappiness(curMood) * elapsed;
@@ -271,7 +284,7 @@ class Guest extends FlxSprite {
 		happinessBar.setPosition(x - 5, y - 5);
 	}
 
-	private function playAnimation() {
+	public function playAnimation() {
 		H.spawnEmotion(this);
 		animation.play(curMood + curActivity.getName() + flipped);
 	}

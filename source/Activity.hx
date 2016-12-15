@@ -11,6 +11,12 @@ class Activity extends FlxSprite {
 	var type: ActivityTypes;
 
 	var energyPerSecond: Float;
+	
+	//If this is set, the guests are automatically kicked out of the activity after this time.
+	var maxGuestStay:Float = 0;
+	
+	//Can a guest be removed from this activity?
+	var guestLeave:Bool = true;
 
 	var happinessAdded: Float;
 	var happinessAddedTime: Float;
@@ -40,6 +46,7 @@ class Activity extends FlxSprite {
 			animation.add('tennis', [1],30, false);
 			animation.add('spa', [2], 30,false);
 			animation.add('room', [3], 30, false);
+			animation.add('coffee', [4], 30, false);
 		} else {
 			this.makeGraphic(FlxG.width, FlxG.height, FlxColor.TRANSPARENT);
 
@@ -103,6 +110,18 @@ class Activity extends FlxSprite {
 			sadnessAdded = 0;
 			sadnessAddedTime = 100;
 			positions.push(new FlxPoint(x + 5, y + 25));
+			flipField = ["normal"];
+			capacity = 1;
+		} else if(name == "coffee") {
+			type = ActivityTypes.drink;
+			guestLeave = false;
+			maxGuestStay = 5;
+			energyPerSecond = -5;
+			happinessAdded = 2;
+			happinessAddedTime = 100;
+			sadnessAdded = 0;
+			sadnessAddedTime = 100;
+			positions.push(new FlxPoint(x + 28, y + 30));
 			flipField = ["normal"];
 			capacity = 1;
 		}
@@ -204,7 +223,7 @@ class Activity extends FlxSprite {
 	}
 	
 	/**
-	 * Gets what the guest's current mood should be based on how long they have done this activity.  
+	 * Gets what the guest's current mood should be based on how long they have done this activity.  \
 	 * @param	activityTime	How long has this guest done this activity
 	 * @return	The mood of the guest.  'happy', 'neutral', 'sad'
 	 */
@@ -267,5 +286,25 @@ class Activity extends FlxSprite {
 	
 	public function getType():ActivityTypes {
 		return type;
+	}
+	
+	/**
+	 * Some of the activities don't let the guests leave.  
+	 * @return	Can the guest leave?		
+	 */
+	public function canGuestLeave():Bool {
+	return guestLeave;
+	}
+	
+	/**
+	 * Checks if this guest needs to be kicked because the activity time is longer than the maxGuestStay value..
+	 * @param	g	Guest to kick out.  Note that if you specify a guest in another activity this may cause problems...
+	 */
+	public function kickMe(g:Guest):Bool {
+		if (maxGuestStay > 0 && g.timeInCurActivity >= maxGuestStay) {
+			H.kickGuest(g);
+			return true;
+		}
+		return false;
 	}
 }
