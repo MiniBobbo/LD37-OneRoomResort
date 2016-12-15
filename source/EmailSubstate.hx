@@ -3,6 +3,7 @@ package;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxSubState;
+import flixel.addons.text.FlxTypeText;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.group.FlxSpriteGroup;
 import flixel.text.FlxText;
@@ -34,6 +35,8 @@ class EmailSubstate extends FlxSubState
 		var from:FlxText = new FlxText(14, 12, 400, 'To: ' + emailTo + '\nFrom: ' + emailFrom + '\nSubject: ' + emailSubject, 12 );
 		from.setFormat(null, 12, FlxColor.BLACK);
 		
+		//var body:FlxTypeText = new FlxTypeText(14, 64, 446, emailText, 8);
+		//body.prefix = 'This is a test:';
 		var body:FlxText = new FlxText(14, 64, 446, emailText, 8);
 		body.setFormat(null, 8, FlxColor.BLACK);
 		
@@ -49,11 +52,13 @@ class EmailSubstate extends FlxSubState
 		
 		add(bg);
 		add(email);
+		add(body);
 		
 		FlxTween.tween(bg, { alpha:.5 }, .5, { onComplete:function(_) {
 			FlxTween.tween(email, {y:0}, .5, {
 				ease:FlxEase.quadInOut, 
 				onComplete: function(_) {
+					//body.start(.005, true, false );
 					movedIn = true;
 				}
 				

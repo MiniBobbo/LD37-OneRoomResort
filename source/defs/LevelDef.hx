@@ -6,7 +6,8 @@ import types.ActivityTypes;
  */
 typedef LevelDef =
 {
-	var levelNum:Int;
+	//This will be calculated automatically.
+	@:optional var levelNum:Int;
 	//Level name
 	var name:String;
 	//Which activities should be in the level.

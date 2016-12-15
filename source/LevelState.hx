@@ -29,6 +29,9 @@ class LevelState extends FlxState
 	private var timeRemaining:Float;
 	private var timerText:FlxText;
 
+	//A helper pointer to the nothing activity.
+	private var nothingActivity:Activity;
+	
 	public static var heldGuest: Guest;
 	var bg:FlxSprite;
 
@@ -94,7 +97,8 @@ class LevelState extends FlxState
 				x = 80;
 			}
 		}
-		activityGroup.add(new Activity(0, 0, 'nothing'));
+		nothingActivity = new Activity(0, 0, 'nothing');
+		activityGroup.add(nothingActivity);
 
 		for(a in activityGroup) {
 			add(a);
@@ -103,7 +107,7 @@ class LevelState extends FlxState
 		for(i in 0...levelInfo.guests) {
 			var x = rand.int(0, 60);
 			var y = rand.int(0, FlxG.height - 40);
-			var genders = ["guestfemale", "guestfemale"];
+			var genders = ["guest", "guestfemale"];
 			var gender = genders[rand.int(0, genders.length-1)];
 			var guest: Guest;
 			guest = new Guest(x, y, gender);
@@ -187,6 +191,7 @@ class LevelState extends FlxState
 			}
 		}
 		
+		processKickedGuests();
 		
 		timeRemaining -= elapsed;
 		
@@ -260,5 +265,26 @@ class LevelState extends FlxState
 		
 		wantTimer = levelInfo.wantBaseTime + FlxG.random.float(0, levelInfo.wantVariableTime);
 		
+	}
+	
+	/**
+	 * Goes through H.kickedGuests and kicks them out of their activities.
+	 */
+	private function processKickedGuests() {
+		for (i in 0...H.kickGuests.length) {
+			//Get the next guest.
+			var guest = H.kickGuests.pop();
+				guest.prevActivity = guest.curActivity;
+				guest.curActivity.removeGuest(guest);
+				guest.curActivity = nothingActivity;
+				guest.setPosition(guest.prevActivity.x, guest.prevActivity.y + guest.prevActivity.height);
+				guest.lastPoint.x = guest.x;
+				guest.lastPoint.y = guest.y;
+					guest.timeInCurActivity = 0;
+				guest.playAnimation();
+
+			//Kick the guest out of its activity.
+			
+		}
 	}
 }

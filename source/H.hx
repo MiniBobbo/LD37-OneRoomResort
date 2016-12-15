@@ -16,6 +16,8 @@ class H
 	public static var levels:Array<defs.LevelDef>;
 	public static var emotions:Array<EmotDef>;
 	
+	//A list of all the guests that should be kicked next update loop.
+	public static var kickGuests:Array<Guest>;
 	
 	/**
 	 * Puts this guest in the queue to have an emotion spawn this turn.
@@ -27,12 +29,17 @@ class H
 			emot:emot});
 	}
 	
+	public static function kickGuest(guest:Guest) {
+		kickGuests.push(guest);
+	}
+	
 	/**
 	 * Inits the static variables.
 	 */
 	public static function init() {
 		levels = [];
 		emotions = [];
+		kickGuests = [];
 		
 		levels.push( {
 			levelNum:1,
@@ -95,7 +102,7 @@ class H
 			
 			startTo:'TheBossMan@oneroomresort.com',
 			startFrom:'activities@oneroomresort.com',
-			startSubject:'Another spa?  Seriously?',
+			startSubject:'re: Another spa?  Seriously?',
 			startEmail:"Chad,\n\nI don't think you are really reading my emails.  This is getting worse and worse every week.  How do you expect me to keep almost 10 people entertained when they are all falling over from exhaustion?  This must be some sort of health code violation or something.\nI'm not normaly a quitter, but if this situation isn't rectified by the end of the week I'm afraid that you will have to find a new activities coordinator.\n\nSusan, Activities Coordinator",
 			endTo:'activities@oneroomresort.com',
 			endFrom:'TheBossMan@oneroomresort.com',
@@ -124,6 +131,29 @@ class H
 			endSubject:'Your Inquiry',
 			endEmail:"Hi Susan,\nThanks for your interest in a job at Competing Resorts!  I am just writing to let you know that we received your resume and will be reviewing it shortly.  Someone should be reaching out to you in the next week or two to set up an interview.  \n\nHarold Finch\nHR Representative\nCompetingResorts.com"
 		});
+		levels.push( {
+			name:'Coffeehouse Blues',
+			guests:5,
+			activities:['room', 'pool', 'spa', 'tennis', 'coffee'],
+			gameLength:90,
+			
+			wantBaseTime:10,
+			wantVariableTime:10,
+			wantList:[ActivityTypes.relaxation, ActivityTypes.exercise],
+			wantGuestTimeLimit:5,
+			
+			startTo:'activities@oneroomresort.com',
+			startFrom:'TheBossMan@oneroomresort.com',
+			startSubject:'Sleepy guests',
+			startEmail:"Hey Susan!!!,\n\nRead your past updates!  Awesome stuff!  Keep up the good work!\n\nI noticed the theme of sleepy guests coming up repeatedly in your reoprts.  Very astute!  I knew when I hired you that you would really dial into the guests feelings and desires!  You haven't disappointed me yet!\n\nI came up with a solution to the sleeping guests problem.  Obviously we need more...\n\nCoffee Bars!!  Coffee will give the guests a jolt of energy and happiness.  Just make sure that the get to the bathroom in a timely manner!!\n\nChad 'The Boss' Huntington",
+			endTo:'TheBossMan@oneroomresort.com',
+			endFrom:'activities@oneroomresort.com',
+			endSubject:'re: Sleepy guests',
+			endEmail:"Chad,\nYou just aren't getting this.  The guests are falling asleep because we only have a single room that they all sleep in one at a time.  I'm not sure how you aren't understanding this.  I personally would HATE coming to your resort!  \nSusan"
+		});
+		
+		for (i in 0...levels.length) 
+			levels[i].levelNum = i;
 
 	}
 	

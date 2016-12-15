@@ -9,4 +9,5 @@ enum ActivityTypes
 	nothing;
 	exercise;
 	sleep;
+	drink;
 }
