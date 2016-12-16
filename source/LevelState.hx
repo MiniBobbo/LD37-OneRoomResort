@@ -13,6 +13,7 @@ import flixel.math.FlxPoint;
 import flixel.math.FlxRandom;
 import flixel.text.FlxText;
 import flixel.ui.FlxBar;
+import flixel.util.FlxSort;
 import types.ActivityTypes;
 import types.MoodType;
 /**
@@ -36,6 +37,7 @@ class LevelState extends FlxState
 	var bg:FlxSprite;
 
 	var guestGroup:FlxTypedGroup<Guest>;
+	var guestInfoGroup:FlxTypedGroup<FlxSprite>;
 	var emoteGroup:FlxTypedGroup<Emot>;
 	
 	public static var activityGroup:FlxTypedGroup<Activity>;
@@ -75,6 +77,7 @@ class LevelState extends FlxState
 		
 
 		guestGroup = new FlxTypedGroup<Guest>();
+		guestInfoGroup = new FlxTypedGroup<FlxSprite>();
 		activityGroup = new FlxTypedGroup<Activity>();
 		heldGuest = null;
 		
@@ -112,14 +115,16 @@ class LevelState extends FlxState
 			var guest: Guest;
 			guest = new Guest(x, y, gender);
 			guest.setPosition(x, y);
-			add(guest.getEnergyBar());
-			add(guest.getHappinessBar());
-			add(guest.getWantBubble());
+			guestInfoGroup.add(guest.getEnergyBar());
+			guestInfoGroup.add(guest.getHappinessBar());
+			guestInfoGroup.add(guest.getWantBubble());
 
 			guestGroup.add(guest);
+			
 		}
 
 		add(guestGroup);
+		add(guestInfoGroup);
 		//for (g in guestGroup) {
 			//add(g);
 		//}
@@ -225,6 +230,9 @@ class LevelState extends FlxState
 			dragTarget.setPosition(FlxG.mouse.x + dragOffset.x, FlxG.mouse.y + dragOffset.y);
 		}
 		
+		//Sort the guests by Y so they display correctly.
+		guestGroup.sort(FlxSort.byY, FlxSort.ASCENDING);		
+		
 	}
 	
 	public function endLevel() {
@@ -290,7 +298,7 @@ class LevelState extends FlxState
 				guest.setPosition(guest.prevActivity.x + FlxG.random.float(0, guest.prevActivity.width), guest.prevActivity.y + guest.prevActivity.height);
 				guest.lastPoint.x = guest.x;
 				guest.lastPoint.y = guest.y;
-					guest.timeInCurActivity = 0;
+				guest.timeInCurActivity = 0;
 				guest.playAnimation();
 
 			//Kick the guest out of its activity.
