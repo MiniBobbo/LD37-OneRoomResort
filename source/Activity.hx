@@ -47,6 +47,7 @@ class Activity extends FlxSprite {
 			animation.add('spa', [2], 30,false);
 			animation.add('room', [3], 30, false);
 			animation.add('coffee', [4], 30, false);
+			animation.add('potty', [5], 30, false);
 		} else {
 			this.makeGraphic(FlxG.width, FlxG.height, FlxColor.TRANSPARENT);
 
@@ -124,6 +125,19 @@ class Activity extends FlxSprite {
 			positions.push(new FlxPoint(x + 28, y + 30));
 			flipField = ["normal"];
 			capacity = 1;
+		} else if(name == "potty") {
+			type = ActivityTypes.potty;
+			guestLeave = false;
+			maxGuestStay = 3;
+			energyPerSecond = 0;
+			happinessAdded = 0;
+			happinessAddedTime = 0;
+			sadnessAdded = 0;
+			sadnessAddedTime = 100;
+			positions.push(new FlxPoint(x + 12, y + 28));
+			positions.push(new FlxPoint(x + 57, y + 28));
+			flipField = ["normal", "normal"];
+			capacity = 2;
 		}
 
 		animation.play(name);

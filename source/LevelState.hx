@@ -274,10 +274,20 @@ class LevelState extends FlxState
 		for (i in 0...H.kickGuests.length) {
 			//Get the next guest.
 			var guest = H.kickGuests.pop();
+			//After kicking the guests, do something if necessary.
+			switch (guest.curActivity.getName()) 
+			{
+				case 'coffee':
+					guest.createWant(ActivityTypes.potty, 5);
+					
+				default:
+					
+			}
+			
 				guest.prevActivity = guest.curActivity;
 				guest.curActivity.removeGuest(guest);
 				guest.curActivity = nothingActivity;
-				guest.setPosition(guest.prevActivity.x, guest.prevActivity.y + guest.prevActivity.height);
+				guest.setPosition(guest.prevActivity.x + FlxG.random.float(0, guest.prevActivity.width), guest.prevActivity.y + guest.prevActivity.height);
 				guest.lastPoint.x = guest.x;
 				guest.lastPoint.y = guest.y;
 					guest.timeInCurActivity = 0;

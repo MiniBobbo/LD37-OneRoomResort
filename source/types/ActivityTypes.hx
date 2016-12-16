@@ -10,4 +10,5 @@ enum ActivityTypes
 	exercise;
 	sleep;
 	drink;
+	potty;
 }

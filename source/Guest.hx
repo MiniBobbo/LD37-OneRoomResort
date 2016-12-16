@@ -70,8 +70,10 @@ class Guest extends FlxSprite {
 		wantBubble.animation.add('sleep', [0]);
 		wantBubble.animation.add('exercise', [1]);
 		wantBubble.animation.add('relaxation', [2]);
+		wantBubble.animation.add('potty', [3]);
+		
 		wantBubble.visible = false;
-		wantBubbuelOffset = new FlxPoint(32,-10);
+		wantBubbuelOffset = new FlxPoint(23,0);
 		
 		this.loadGraphic('assets/images/'+ type+ '.png', true, 32, 32);
 
@@ -100,7 +102,9 @@ class Guest extends FlxSprite {
 		animation.add('happycoffeenormal', [25, 24], frameTime, false);
 		animation.add('neutralcoffeenormal', [25, 24], frameTime, false);
 		animation.add('sadcoffeenormal', [25, 24], frameTime, false);
-		
+		animation.add('happypottynormal', [26], frameTime, false);
+		animation.add('neutralpottynormal', [26], frameTime, false);
+		animation.add('sadpottynormal', [26], frameTime, false);
 
 		animation.add('happynothingflipped', [1, 0], frameTime, false, true);
 		animation.add('neutralnothingflipped', [3, 2], frameTime, false, true);
@@ -117,7 +121,9 @@ class Guest extends FlxSprite {
 		animation.add('sadspaflipped', [23, 22], frameTime, false, true);
 		animation.add('happycoffeeflipped', [25, 24], frameTime, false, true);
 		animation.add('neutralcoffeeflipped', [25, 24], frameTime, false, true);
-		animation.add('sadcoffeeflipped', [25, 24], frameTime, false, true);
+		animation.add('happypottyflipped', [26], frameTime, false, true);
+		animation.add('neutralpottyflipped', [26], frameTime, false, true);
+		animation.add('sadpottyflipped', [26], frameTime, false, true);
 
 
 		lastPoint = new FlxPoint(x, y);
@@ -162,6 +168,8 @@ class Guest extends FlxSprite {
 
 		var newActivity:Bool = false;
 
+			
+	
 		for(a in LevelState.activityGroup) {
 			if(a.overlapsPoint(FlxG.mouse.getPosition())) {
 				if(!a.addGuest(this)) {
@@ -185,6 +193,7 @@ class Guest extends FlxSprite {
 				break;
 			}
 		}
+		
 	}
 
 	override public function update(elapsed: Float) {
