@@ -145,11 +145,11 @@ class H
 			startTo:'activities@oneroomresort.com',
 			startFrom:'TheBossMan@oneroomresort.com',
 			startSubject:'Sleepy guests',
-			startEmail:"Hey Susan!!!,\n\nRead your past updates!  Awesome stuff!  Keep up the good work!\n\nI noticed the theme of sleepy guests coming up repeatedly in your reoprts.  Very astute!  I knew when I hired you that you would really dial into the guests feelings and desires!  You haven't disappointed me yet!\n\nI came up with a solution to the sleeping guests problem.  Obviously we need more...\n\nCoffee Bars!!  Coffee will give the guests a jolt of energy and happiness.  Just make sure that the get to the bathroom in a timely manner!!\n\nChad 'The Boss' Huntington",
+			startEmail:"Hey Susan!!!,\n\nRead your past updates!  Awesome stuff!  Keep up the good work!\n\nI noticed the theme of sleepy guests coming up repeatedly in your reoprts.  Very astute!  I knew when I hired you that you would really dial into the guests feelings and desires!  You haven't disappointed me yet!\n\nI came up with a solution to the sleeping guests problem.  Obviously we need more...\n\nCoffee Bars!!  Coffee will give the guests a jolt of energy and happiness.  Just make sure that they get to the bathroom in a timely manner!!\n\nChad 'The Boss' Huntington",
 			endTo:'TheBossMan@oneroomresort.com',
 			endFrom:'activities@oneroomresort.com',
 			endSubject:'re: Sleepy guests',
-			endEmail:"Chad,\nYou just aren't getting this.  The guests are falling asleep because we only have a single room that they all sleep in one at a time.  I'm not sure how you aren't understanding this.  I personally would HATE coming to your resort!  \nSusan"
+			endEmail:"Chad,\nYou just aren't getting this.  The guests are falling asleep because we only have a single room for them to rest in.  I'm not sure how you aren't understanding this.  I personally would HATE coming to your resort!  \n\n\nSusan"
 		});
 		
 		for (i in 0...levels.length) 
