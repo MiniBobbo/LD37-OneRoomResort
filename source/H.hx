@@ -134,7 +134,7 @@ class H
 		levels.push( {
 			name:'Coffeehouse Blues',
 			guests:5,
-			activities:['room', 'pool', 'spa', 'tennis', 'coffee'],
+			activities:['room', 'pool', 'spa', 'tennis', 'coffee', 'potty'],
 			gameLength:90,
 			
 			wantBaseTime:10,
