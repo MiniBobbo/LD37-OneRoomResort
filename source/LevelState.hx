@@ -264,13 +264,20 @@ class LevelState extends FlxState
 		//Try 10 times to find a guest without a want.  If not, just give up and try again next loop.  
 		for (i in 0...10) {
 			var g:Guest = guestGroup.getRandom();
-			if (g.want == ActivityTypes.nothing) {
-				g.createWant(levelInfo.wantList[FlxG.random.int(0, levelInfo.wantList.length - 1)], levelInfo.wantGuestTimeLimit);
+			if (g.want == ActivityTypes.nothing && g.curActivity.getName() != 'room') {
+				var tempWant:ActivityTypes;
+				//Generate a want that should be created.
+				//TODO: Make this smarter.  Maybe get a copy of the level want list and strip out the guest's current activity?
+				for (i in 0...10) {
+					tempWant = levelInfo.wantList[FlxG.random.int(0, levelInfo.wantList.length - 1)];
+					if (tempWant != g.curActivity.getType()) {
+						g.createWant(tempWant, levelInfo.wantGuestTimeLimit);
+						break;
+					}
+				}
 				break;
 			}
-				
 		}
-		
 		wantTimer = levelInfo.wantBaseTime + FlxG.random.float(0, levelInfo.wantVariableTime);
 		
 	}
