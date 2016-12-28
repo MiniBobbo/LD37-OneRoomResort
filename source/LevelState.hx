@@ -211,6 +211,15 @@ class LevelState extends FlxState
 			}
 		}
 		
+		//Calculate if a want should be generated
+		if (wants) {
+			wantTimer -= elapsed;
+			//If the timer has expired, generate a want.  
+			if (wantTimer <= 0) {
+				generateWant();
+			}
+		}
+
 		if (timeRemaining <= 0) {
 			//Create the end of level email and display it.
 			if (levelInfo.endEmail != null) {
