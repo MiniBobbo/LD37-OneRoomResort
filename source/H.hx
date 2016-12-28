@@ -1,4 +1,7 @@
 package;
+import defs.EmotDef;
+import defs.LevelDef;
+import types.ActivityTypes;
 
 /**
  * ...
@@ -10,16 +13,24 @@ class H
 	//This is a hacky way around the substate being closed problem.
 	public static var subStateClosed:Bool = false;
 	
-	public static var levels:Array<LevelDef>;
-	public static var emotions:Array<Guest>;
+	public static var levels:Array<defs.LevelDef>;
+	public static var emotions:Array<EmotDef>;
 	
+	//A list of all the guests that should be kicked next update loop.
+	public static var kickGuests:Array<Guest>;
 	
 	/**
 	 * Puts this guest in the queue to have an emotion spawn this turn.
 	 * @param	guest
 	 */
-	public static function spawnEmotion(guest:Guest) {
-		emotions.push(guest);
+	public static function spawnEmotion(guest:Guest, emot:String = '') {
+		emotions.push( { 
+			guest:guest,
+			emot:emot});
+	}
+	
+	public static function kickGuest(guest:Guest) {
+		kickGuests.push(guest);
 	}
 	
 	/**
@@ -28,13 +39,14 @@ class H
 	public static function init() {
 		levels = [];
 		emotions = [];
+		kickGuests = [];
 		
 		levels.push( {
 			levelNum:1,
 			name:'Starting Out',
 			guests:3,
 			activities:['room', 'pool', 'spa'],
-			gameLength:30,
+			gameLength:45,
 			
 			startTo:'activities@oneroomresort.com',
 			startFrom:'TheBossMan@oneroomresort.com',
@@ -74,7 +86,7 @@ class H
 			startTo:'TheBossMan@oneroomresort.com',
 			startFrom:'activities@oneroomresort.com',
 			startSubject:'Another spa?  Seriously?',
-			startEmail:"Chad,\n\nThis is getting rediculous.  How do you expect me to keep everyone entertained when there is only a single room for sleeping?  I'm going to have people falling asleep all over the place!\n\nSusan, Activities Coordinator",
+			startEmail:"Chad,\n\nThis is getting ridiculous.  How do you expect me to keep everyone entertained when there is only a single room for sleeping?  I'm going to have people falling asleep all over the place!\n\nSusan, Activities Coordinator",
 			endTo:'activities@oneroomresort.com',
 			endFrom:'TheBossMan@oneroomresort.com',
 			endSubject:'Automatic Reply: Still only one room',
@@ -90,14 +102,59 @@ class H
 			
 			startTo:'TheBossMan@oneroomresort.com',
 			startFrom:'activities@oneroomresort.com',
-			startSubject:'Another spa?  Seriously?',
+			startSubject:'re: Another spa?  Seriously?',
 			startEmail:"Chad,\n\nI don't think you are really reading my emails.  This is getting worse and worse every week.  How do you expect me to keep almost 10 people entertained when they are all falling over from exhaustion?  This must be some sort of health code violation or something.\nI'm not normaly a quitter, but if this situation isn't rectified by the end of the week I'm afraid that you will have to find a new activities coordinator.\n\nSusan, Activities Coordinator",
 			endTo:'activities@oneroomresort.com',
 			endFrom:'TheBossMan@oneroomresort.com',
 			endSubject:'re: Another spa?  Seriously?',
-			endEmail:"Hi Susan!\nI' noticing a little frustration in your last email.  I feel like we haven't been communicating well, so I've taken the liberty of signing you up for a wonderful class my brother teaches called 'Communicating in the Workplace' because, just between the two of us, communication isn't your strong point.  Don't worry though!  We all have areas we can improve!!\nJust to make sure I address your concerns I re-read your email very carefully.  I love your idea of adding anther spa!!!  I'll call the contractors.\n\nChad 'The Boss' Huntington"
+			endEmail:"Hi Susan!\nI'm noticing a little frustration in your last email.  I feel like we haven't been communicating well, so I've taken the liberty of signing you up for a wonderful class my brother teaches called 'Communicating in the Workplace' because, just between the two of us, communication isn't your strong point.  Don't worry though!  We all have areas we can improve!!\n\nJust to make sure I address your concerns I re-read your email very carefully.  I love your idea of adding anther spa!!!  I'll call the contractors.\n\nChad 'The Boss' Huntington"
+		});
+
+		levels.push( {
+			levelNum:5,
+			name:'Pushy Guests',
+			guests:5,
+			activities:['room', 'pool', 'spa', 'tennis', 'spa'],
+			gameLength:90,
+			
+			wantBaseTime:5,
+			wantVariableTime:10,
+			wantList:[ActivityTypes.relaxation, ActivityTypes.exercise],
+			wantGuestTimeLimit:5,
+			
+			startTo:'activities@oneroomresort.com',
+			startFrom:'TheBossMan@oneroomresort.com',
+			startSubject:'VIPs coming this week!',
+			startEmail:"Hey Susan!!!,\n\nI just wanted to drop a note to say thanks for what a great job you are doing!  Last week was a little crazy, huh?  All those guests!  Wow!  The great news is that THIS week will be much easier.  Only a few guests.  I've taken some of the activity areas down for maintenance, but I'm sure you will find stuff for everyone to do!\n\nI probably should mention that this week we have some particularly picky guests coming.  Don't be surprised if they make requests for different activities.  Meeting a guest's wants give them a happiness and energy boost, so be sure to get to them as soon as possible.  There are other benefits to meeting the wants of the guests.  For instance, the intense feeling of satisfaction you get for a job well done.  \n\nDo your best to accomodate them!\n\nChad 'The Boss' Huntington",
+			endTo:'activities@oneroomresort.com',
+			endFrom:'HR@competingresorts.com',
+			endSubject:'Your Inquiry',
+			endEmail:"Hi Susan,\nThanks for your interest in a job at Competing Resorts!  I am just writing to let you know that we received your resume and will be reviewing it shortly.  Someone should be reaching out to you in the next week or two to set up an interview.  \n\nHarold Finch\nHR Representative\nCompetingResorts.com"
+		});
+		levels.push( {
+			name:'Coffeehouse Blues',
+			guests:5,
+			activities:['room', 'pool', 'spa', 'tennis', 'coffee', 'potty'],
+			gameLength:90,
+			
+			wantBaseTime:10,
+			wantVariableTime:10,
+			wantList:[ActivityTypes.relaxation, ActivityTypes.exercise],
+			wantGuestTimeLimit:5,
+			
+			startTo:'activities@oneroomresort.com',
+			startFrom:'TheBossMan@oneroomresort.com',
+			startSubject:'Sleepy guests',
+			startEmail:"Hey Susan!!!,\n\nRead your past updates!  Awesome stuff!  Keep up the good work!\n\nI noticed the theme of sleepy guests coming up repeatedly in your reoprts.  Very astute!  I knew when I hired you that you would really dial into the guests feelings and desires!  You haven't disappointed me yet!\n\nI came up with a solution to the sleeping guests problem.  Obviously we need more...\n\nCoffee Bars!!  Coffee will give the guests a jolt of energy and happiness.  Just make sure that they get to the bathroom in a timely manner!!\n\nChad 'The Boss' Huntington",
+			endTo:'TheBossMan@oneroomresort.com',
+			endFrom:'activities@oneroomresort.com',
+			endSubject:'re: Sleepy guests',
+			endEmail:"Chad,\nYou just aren't getting this.  The guests are falling asleep because we only have a single room for them to rest in.  I'm not sure how you aren't understanding this.  I personally would HATE coming to your resort!  \n\n\nSusan"
 		});
 		
+		for (i in 0...levels.length) 
+			levels[i].levelNum = i;
+
 	}
 	
 }

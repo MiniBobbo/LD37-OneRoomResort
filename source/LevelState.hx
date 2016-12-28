@@ -1,5 +1,7 @@
 package;
 
+import defs.EmotDef;
+import defs.LevelDef;
 import defs.LevelEndDef;
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -12,6 +14,9 @@ import flixel.math.FlxRandom;
 import flixel.text.FlxText;
 import flixel.ui.FlxBar;
 import defs.LevelEndDef;
+import flixel.util.FlxSort;
+import types.ActivityTypes;
+import types.MoodType;
 /**
  * ...
  * @author Dave
@@ -26,16 +31,24 @@ class LevelState extends FlxState
 	private var timeRemaining:Float;
 	private var timerText:FlxText;
 
+	//A helper pointer to the nothing activity.
+	private var nothingActivity:Activity;
+	
 	public static var heldGuest: Guest;
 	var bg:FlxSprite;
 
 	var guestGroup:FlxTypedGroup<Guest>;
+	var guestInfoGroup:FlxTypedGroup<FlxSprite>;
 	var emoteGroup:FlxTypedGroup<Emot>;
 	
 	public static var activityGroup:FlxTypedGroup<Activity>;
-	var levelInfo:LevelDef;
+	var levelInfo:defs.LevelDef;
 
-	override public function new(levelInfo: LevelDef):Void {
+	//Want variables
+	var wantTimer:Float;
+	var wants:Bool = false;
+	
+	override public function new(levelInfo: defs.LevelDef):Void {
 		super();
 		this.levelInfo = levelInfo;
 		H.subStateClosed = false;
@@ -45,13 +58,12 @@ class LevelState extends FlxState
 	{
 		super.create();
 
-		FlxG.watch.add(H, 'subStateClosed');
 		
 		//Initialize the emot group
 		emoteGroup = new FlxTypedGroup<Emot>();
 		
 		//Create a bunch of emots.
-		for (i in 0...50) {
+		for (i in 0...100) {
 			var s = new Emot();
 			s.kill();
 			emoteGroup.add(s);
@@ -66,10 +78,17 @@ class LevelState extends FlxState
 		
 
 		guestGroup = new FlxTypedGroup<Guest>();
+		guestInfoGroup = new FlxTypedGroup<FlxSprite>();
 		activityGroup = new FlxTypedGroup<Activity>();
 		heldGuest = null;
 		
-		bg = new FlxSprite(0, 0, 'assets/images/bg.png');
+		if (levelInfo.wantList != null && levelInfo.wantList.length > 0) {
+			wants = true;
+			wantTimer = levelInfo.wantBaseTime + FlxG.random.float(0,levelInfo.wantVariableTime);
+		} else
+		wantTimer = 0;
+		
+		bg = new FlxSprite(0, 0, 'assets/images/bg1.png');
 		add(bg);
 		var maxX = 368;
 		var x = 80;
@@ -82,7 +101,8 @@ class LevelState extends FlxState
 				x = 80;
 			}
 		}
-		activityGroup.add(new Activity(0, 0, 'nothing'));
+		nothingActivity = new Activity(0, 0, 'nothing');
+		activityGroup.add(nothingActivity);
 
 		for(a in activityGroup) {
 			add(a);
@@ -92,24 +112,46 @@ class LevelState extends FlxState
 			var x = rand.int(0, 60);
 			var y = rand.int(0, FlxG.height - 40);
 			var genders = ["guest", "guestfemale"];
-			var gender = genders[rand.int(0, 1)];
+			var gender = genders[rand.int(0, genders.length-1)];
 			var guest: Guest;
 			guest = new Guest(x, y, gender);
-			add(guest.getEnergyBar());
-			add(guest.getHappinessBar());
+			guest.setPosition(x, y);
+			guestInfoGroup.add(guest.getEnergyBar());
+			guestInfoGroup.add(guest.getHappinessBar());
+			guestInfoGroup.add(guest.getWantBubble());
 
 			guestGroup.add(guest);
+			
 		}
 
-		for (g in guestGroup) {
-			add(g);
-		}
+		add(guestGroup);
+		add(guestInfoGroup);
+		//for (g in guestGroup) {
+			//add(g);
+		//}
 
 		timeRemaining = levelInfo.gameLength;
 		timerText = new FlxText(FlxG.width - 50, FlxG.height - 20, 0,getTimeText(timeRemaining), 16);
 		add(timerText);
 		add(emoteGroup);
 		//openSubState(new EmailSubstate('Dave', 'Izzybelle', 'I want food!', 'Feed me human!'));
+		
+		//Set up watches for all the guest variables
+		//for (i in 0...guestGroup.length) {
+			//FlxG.watch.add(guestGroup.members[i], 'happiness', 'Guest ' + i + ' H:');
+			//FlxG.watch.add(guestGroup.members[i], 'energy', 'Guest ' + i + ' E:');
+			//FlxG.watch.add(guestGroup.members[i], 'idle', 'Guest ' + i + ' I:');
+			//FlxG.watch.add(guestGroup.members[i], 'idleTime', 'Guest ' + i + ' IT:');
+			//FlxG.watch.add(guestGroup.members[i], 'curMood', 'Guest ' + i + ' M:');
+			//FlxG.watch.add(guestGroup.members[i], 'timeInCurActivity', 'Guest ' + i + ' CA:');
+			//
+		//}
+		for (a in activityGroup) {
+			FlxG.watch.add(a, 'name');
+			FlxG.watch.add(a, 'guests');
+			
+		}
+		
 	}
 
 	public function getTimeText(timeRemaining: Float): String {
@@ -135,54 +177,48 @@ class LevelState extends FlxState
 
 		//Check the emotion spawn queue and spawn any important emotions.
 		for (i in 0...H.emotions.length) {
-			var g = H.emotions.pop();
-			if (g.getMood() == 'happy' && g.curActivity.getName() != 'nothing') {
-				//TODO  Add an icon spawn here.
-				emoteGroup.getFirstAvailable().spawn(g);
-				FlxG.sound.play('assets/sounds/hearts.wav', .1);
-			} else if (g.getMood() == 'sad') {
-				emoteGroup.getFirstAvailable().spawn(g);
-				FlxG.sound.play('assets/sounds/sad.wav', .1);
+			//TODO:  Going over max emotes causes a crash.  Fix this.
+			var e:EmotDef = H.emotions.pop();
+			var g:Guest = e.guest;
+			//If the emot isn't blank, play that emote instead of getting the guest happiness..
+			var emote = emoteGroup.getFirstAvailable();
+			if(e != null) {
+			if (e.emot != '') {
+				emote.spawn(g,e.emot);
+				}
+				else if (g.getMood() == MoodType.happy && g.curActivity.getName() != 'nothing') {
+					//TODO  Add an icon spawn here.
+					emote.spawn(g);
+					FlxG.sound.play('assets/sounds/hearts.wav', .1);
+				} else if (g.getMood() == MoodType.sad) {
+					emote.spawn(g);
+					FlxG.sound.play('assets/sounds/sad.wav', .1);
+				}
 			}
-			
 		}
 		
+		processKickedGuests();
 		
 		timeRemaining -= elapsed;
-<<<<<<< HEAD
-		if(timeRemaining <= 0) {
-			var endHappiness = new Array<Float>();
-			var guestGenders = new Array<String>();
-			for(g in guestGroup) {
-				endHappiness.push(g.happiness);
-				guestGenders.push(g.getGender());
-			}
-			var endDef:LevelEndDef = {
-				level:1,
-				levelName:levelInfo.name,
-				guestHappiness:endHappiness,
-				guestType:guestGenders
-			};
 
-			FlxG.switchState(new LevelEndState(endDef));
-		}
-=======
 		
-		//TODO: Level End state
+		//Calculate if a want should be generated
+		if (wants) {
+			wantTimer -= elapsed;
+			//If the timer has expired, generate a want.  
+			if (wantTimer <= 0) {
+				generateWant();
+			}
+		}
+		
 		if (timeRemaining <= 0) {
 			//Create the end of level email and display it.
 			if (levelInfo.endEmail != null) {
 				var ss:EmailSubstate = new EmailSubstate(levelInfo.endFrom, levelInfo.endTo, levelInfo.endSubject, levelInfo.endEmail, true);
-				FlxG.log.add('Should be transitioning to substate');
 				openSubState(ss);
 			} else
 			endLevel();
-		
-			
-			
 		}
-		
->>>>>>> 8ac0cb7d96444762f3856405cba938bc283dcef0
 
 		timerText.text = getTimeText(timeRemaining);
 		
@@ -194,6 +230,9 @@ class LevelState extends FlxState
 		if(dragging) {
 			dragTarget.setPosition(FlxG.mouse.x + dragOffset.x, FlxG.mouse.y + dragOffset.y);
 		}
+		
+		//Sort the guests by Y so they display correctly.
+		guestGroup.sort(FlxSort.byY, FlxSort.ASCENDING);		
 		
 	}
 	
@@ -217,5 +256,61 @@ class LevelState extends FlxState
 			//If there is no substate open, go to the end state.
 			if (H.subStateClosed)
 				FlxG.switchState(endState);
+	}
+	
+	/**
+	 * Generates a want from the list for one of the guests.
+	 */
+	private function generateWant() {
+		//Try 10 times to find a guest without a want.  If not, just give up and try again next loop.  
+		for (i in 0...10) {
+			var g:Guest = guestGroup.getRandom();
+			if (g.want == ActivityTypes.nothing && g.curActivity.getName() != 'room') {
+				var tempWant:ActivityTypes;
+				//Generate a want that should be created.
+				//TODO: Make this smarter.  Maybe get a copy of the level want list and strip out the guest's current activity?
+				for (i in 0...10) {
+					tempWant = levelInfo.wantList[FlxG.random.int(0, levelInfo.wantList.length - 1)];
+					if (tempWant != g.curActivity.getType()) {
+						g.createWant(tempWant, levelInfo.wantGuestTimeLimit);
+						break;
+					}
+				}
+				break;
+			}
+		}
+		wantTimer = levelInfo.wantBaseTime + FlxG.random.float(0, levelInfo.wantVariableTime);
+		
+	}
+	
+	/**
+	 * Goes through H.kickedGuests and kicks them out of their activities.
+	 */
+	private function processKickedGuests() {
+		for (i in 0...H.kickGuests.length) {
+			//Get the next guest.
+			var guest = H.kickGuests.pop();
+			//After kicking the guests, do something if necessary.
+			switch (guest.curActivity.getName()) 
+			{
+				case 'coffee':
+					guest.createWant(ActivityTypes.potty, 5);
+					
+				default:
+					
+			}
+			
+				guest.prevActivity = guest.curActivity;
+				guest.curActivity.removeGuest(guest);
+				guest.curActivity = nothingActivity;
+				guest.setPosition(guest.prevActivity.x + FlxG.random.float(0, guest.prevActivity.width), guest.prevActivity.y + guest.prevActivity.height);
+				guest.lastPoint.x = guest.x;
+				guest.lastPoint.y = guest.y;
+				guest.timeInCurActivity = 0;
+				guest.playAnimation();
+
+			//Kick the guest out of its activity.
+			
+		}
 	}
 }
