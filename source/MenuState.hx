@@ -14,22 +14,32 @@ class MenuState extends FlxState
 	{
 		super.create();
 		
-		var start:FlxButton = new FlxButton(0,0,"Start Game", clickStart);
+		var bg = new FlxSprite(0, 0, 'assets/images/bg.png');
+		add(bg);
+		
+		var title:FlxText = new FlxText(0, 0, FlxG.width, 'One Room Resort');
+		title.setFormat(null, 35, FlxColor.BLACK, FlxTextAlign.CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.WHITE);
+		title.screenCenter();
+		title.y -= 100;
+		add(title);
+		var start:FlxButton = new FlxButton(0, 0, "Start Game", clickStart);
+		start.screenCenter();
 		add(start);
+		var help:FlxButton = new FlxButton(0, 0, "How to Play", clickHelp);
+		help.screenCenter();
+		help.y += 20;
+		add(help);
 		
 	}
 	
 	private function clickStart() {
-		var level1Def:LevelDef = {
-			name:"Level 1",
-			activities:["room", "pool", "tennis", "spa", "tennis", "spa"],
-			guests: 6,
-			gameLength:240
-		};
 
-
-		var level:LevelState = new LevelState(level1Def);
+		var level:LevelState = new LevelState(H.levels[0]);
 		FlxG.switchState(level);
+	}
+	
+	private function clickHelp() {
+		openSubState(new HelpState());
 	}
 
 	override public function update(elapsed:Float):Void

@@ -34,14 +34,14 @@ class Activity extends FlxSprite {
 		if(name != "nothing") {
 			this.loadGraphic('assets/images/activities.png', true, 96, 76);
 
-			animation.add('pool', [0], false);
-			animation.add('tennis', [1], false);
-			animation.add('spa', [2], false);
-			animation.add('room', [3], false);
+			animation.add('pool', [0], 30, false);
+			animation.add('tennis', [1],30, false);
+			animation.add('spa', [2], 30,false);
+			animation.add('room', [3], 30, false);
 		} else {
 			this.makeGraphic(FlxG.width, FlxG.height, FlxColor.TRANSPARENT);
 
-			animation.add('nothing', [0], false);
+			animation.add('nothing', [0], 30, false);
 		}
 
 		if(name == "nothing") {

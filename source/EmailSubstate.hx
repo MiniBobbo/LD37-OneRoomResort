@@ -21,19 +21,21 @@ class EmailSubstate extends FlxSubState
 	var bg:FlxSprite;
 	
 	var movedIn:Bool = false;
+	var end:Bool;
 	
-	public function new(emailTo:String, emailFrom:String, emailSubject:String, emailText:String) 
+	public function new(emailTo:String, emailFrom:String, emailSubject:String, emailText:String, end:Bool = false) 
 	{
 		super(FlxColor.TRANSPARENT);
 		
+		this.end = end;
 		email = new FlxSpriteGroup();
 		
 		var emailFrame:FlxSprite = new FlxSprite(0, 0, 'assets/images/bg2.png');
 		var from:FlxText = new FlxText(14, 12, 400, 'To: ' + emailTo + '\nFrom: ' + emailFrom + '\nSubject: ' + emailSubject, 12 );
 		from.setFormat(null, 12, FlxColor.BLACK);
 		
-		var body:FlxText = new FlxText(14, 64, 446, emailText, 10);
-		body.setFormat(null, 10, FlxColor.BLACK);
+		var body:FlxText = new FlxText(14, 64, 446, emailText, 8);
+		body.setFormat(null, 8, FlxColor.BLACK);
 		
 		email.add(emailFrame);
 		email.add(from);
@@ -67,9 +69,13 @@ class EmailSubstate extends FlxSubState
 		super.update(elapsed);
 		
 		if (FlxG.mouse.justPressed && movedIn) {
+			H.subStateClosed = true;
 			FlxTween.tween(email, { y:FlxG.height }, .5, {
 				ease:FlxEase.quadInOut, 
 				onComplete: function(_) {
+					if (end) {
+						cast(this._parentState, LevelState).endLevel();
+					} else 
 					this._parentState.closeSubState();
 				}
 				

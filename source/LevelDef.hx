@@ -5,6 +5,7 @@ package;
  */
 typedef LevelDef =
 {
+	var levelNum:Int;
 	//Level name
 	var name:String;
 	//Which activities should be in the level.
